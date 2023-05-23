@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:absensi/pages/home/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -7,15 +6,12 @@ import 'package:absensi/model/name_location.dart';
 import 'package:absensi/model/office_model.dart';
 import 'package:absensi/widget/absensi_jam_realtime.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
-import 'package:path/path.dart';
 import '../helper/exception_handler.dart';
 import '../pages/connection.dart';
 import 'absensi_button.dart';
@@ -53,7 +49,7 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
       responsePresensiKeluar = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -61,6 +57,7 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -309,24 +306,24 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
     int? radius = prefs.getInt('radius');
     if (radius != null) {
       if (radiusUser <= radius) {
-        PleaseWait(context);
+        pleaseWait(context);
         await presensiKeluar(context: context);
         if (responsePresensiKeluar == 200) {
           Navigator.pop(context);
           SharedPreferences prefs = await SharedPreferences.getInstance();
           prefs.remove('presensiMasuk');
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             CustomSnackBar.success(
               message: 'Berhasil Checkout',
             ),
           );
           // Navigator.pop(context, false);
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: ((context) => Navbar())));
+          Navigator.pushAndRemoveUntil(
+              context, MaterialPageRoute(builder: ((context) => Navbar())),(route) => false,);
         } else {
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             CustomSnackBar.error(
               message: 'Terjadi Kesalahan',
             ),
@@ -334,7 +331,7 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
         }
       } else {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'Mohon Memasuki Radius $radius m',
           ),
@@ -342,7 +339,7 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
       }
     } else {
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: 'Terjadi Kesalahan',
         ),

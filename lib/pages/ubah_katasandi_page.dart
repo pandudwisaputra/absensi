@@ -55,7 +55,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -63,6 +63,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -186,13 +187,13 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
             _state = true;
           });
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             const CustomSnackBar.success(
               message: 'Berhasil',
             ),
           );
-          Navigator.pushReplacement(
-              context, CupertinoPageRoute(builder: (context) => Navbar()));
+          Navigator.pushAndRemoveUntil(
+              context, CupertinoPageRoute(builder: (context) => Navbar()),(route) => false,);
           setState(() {
             _state = false;
           });
@@ -201,7 +202,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
             _state = false;
           });
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             CustomSnackBar.error(
               message: statusUpdatePassword!,
             ),
@@ -212,7 +213,7 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
           _state = false;
         });
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           const CustomSnackBar.error(
             message: 'Password Tidak Sama',
           ),

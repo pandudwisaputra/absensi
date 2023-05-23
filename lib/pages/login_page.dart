@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       } catch (e) {
         var error = ExceptionHandlers().getExceptionString(e);
-        await Navigator.pushReplacement(
+        await Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(
             builder: (context) => ConnectionPage(
@@ -63,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
               error: error,
             ),
           ),
+          (route) => false,
         );
       }
     }
@@ -78,9 +79,12 @@ class _LoginPageState extends State<LoginPage> {
 
     void onPressLogin(BuildContext context) async {
       if (_formKey.currentState!.validate()) {
-        setState(() {
+        if(mounted){
+          setState(() {
           _state = true;
         });
+        }
+        
         await loginPegawai(
           email: emailcontroller.text,
           password: passcontroller.text,
@@ -89,8 +93,8 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             _state = true;
           });
-          await Navigator.pushReplacement(context,
-              CupertinoPageRoute(builder: (context) => const Navbar()));
+          await Navigator.pushAndRemoveUntil(context,
+              CupertinoPageRoute(builder: (context) => const Navbar()),(route) => false,);
           setState(() {
             _state = false;
           });
@@ -99,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
             _state = false;
           });
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             const CustomSnackBar.error(
               message: 'Email Atau Password Salah',
             ),
@@ -229,11 +233,11 @@ class _LoginPageState extends State<LoginPage> {
                               border: Border.all(color: Color(0xFF4285F4))),
                           child: AbsensiButton(
                             onPressed: () {
-                              Navigator.pushReplacement(
+                              Navigator.pushAndRemoveUntil(
                                   context,
                                   CupertinoPageRoute(
                                       builder: (context) =>
-                                          const RegisterPage()));
+                                          const RegisterPage()),(route) => false,);
                             },
                             text: Text('REGISTER'),
                             color: Colors.white,

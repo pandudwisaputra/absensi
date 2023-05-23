@@ -23,10 +23,12 @@ class _JamRealTimeState extends State<JamRealTime> {
   void _getTime() {
     final DateTime now = DateTime.now();
     final String formattedDateTime = _formatDateTime(now);
-
-    setState(() {
+if(mounted){
+  setState(() {
       formattedTime = formattedDateTime;
     });
+}
+    
   }
 
   @override

@@ -40,7 +40,7 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
       responseEmailCheck = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -48,6 +48,7 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -71,7 +72,7 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
       print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -79,6 +80,7 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -231,7 +233,7 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
           _state = false;
         });
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'Email belum terdaftar',
           ),

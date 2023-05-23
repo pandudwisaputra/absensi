@@ -1,6 +1,6 @@
 import 'package:absensi/pages/jailbroken_page.dart';
 import 'package:absensi/pages/login_page.dart';
-import 'package:absensi/pages/face_recognition_page.dart';
+import 'package:absensi/pages/add_face_recognition_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';

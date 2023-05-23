@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-PleaseWait(BuildContext context) {
+pleaseWait(BuildContext context) {
             AlertDialog alert = AlertDialog(
               content: Row(
                 children: [

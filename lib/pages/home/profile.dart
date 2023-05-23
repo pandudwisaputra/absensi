@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:absensi/helper/exception_handler.dart';
 import 'package:absensi/pages/connection.dart';
-import 'package:absensi/pages/face_recognition_page.dart';
+import 'package:absensi/pages/add_face_recognition_page.dart';
 import 'package:absensi/widget/loading_presensi.dart';
 import 'package:path/path.dart';
 import 'package:absensi/model/profile_model.dart';
@@ -69,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
       responseUpdateAva = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -77,6 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -274,7 +275,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.push(
                       context,
                       CupertinoPageRoute(
-                          builder: (context) => FaceRecognitionPage()));
+                          builder: (context) => AddFaceRecognitionPage()));
                 },
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,
@@ -291,7 +292,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           width: 20,
                         ),
                         const Text(
-                          "Ajukan Data Wajah",
+                          "Data Face Recognition",
                           style: TextStyle(
                             fontFamily: 'OpenSans',
                             fontSize: 15,
@@ -318,11 +319,12 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.pushReplacement(
+                  Navigator.pushAndRemoveUntil(
                     context,
                     CupertinoPageRoute(
                       builder: (context) => const LoginPage(),
                     ),
+                    (route) => false,
                   );
                 },
                 splashColor: Colors.transparent,
@@ -368,7 +370,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void onPress(BuildContext context) async {
-    PleaseWait(context);
+    pleaseWait(context);
     XFile? file = await getImage(context);
 
     File resultFile = File(file!.path);
@@ -378,7 +380,7 @@ class _ProfilePageState extends State<ProfilePage> {
     if (responseUpdateAva == 200) {
       Navigator.pop(context);
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.success(
           message: 'Berhasil',
         ),
@@ -387,7 +389,7 @@ class _ProfilePageState extends State<ProfilePage> {
     } else {
       Navigator.pop(context);
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: 'Terjadi Kesalahan',
         ),

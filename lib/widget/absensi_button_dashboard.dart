@@ -13,7 +13,7 @@ class Buttondashboard extends StatefulWidget {
 }
 
 class _ButtondashboardState extends State<Buttondashboard> {
-  bool? presensiMasuk;
+  bool presensiMasuk = false;
 
   @override
   void initState() {
@@ -25,15 +25,18 @@ class _ButtondashboardState extends State<Buttondashboard> {
   Future loadlist() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? result = prefs.getBool('presensiMasuk');
-    setState(() {
-      presensiMasuk = result!;
-    });
+    if (mounted) {
+      setState(() {
+        presensiMasuk = result!;
+      });
+    }
+
     print('Status : $presensiMasuk');
   }
 
   @override
   Widget build(BuildContext context) {
-    if (presensiMasuk == null) {
+    if (presensiMasuk == false) {
       return AbsensiButton(
         onPressed: () async {
           showModalBottomSheet(
@@ -48,9 +51,11 @@ class _ButtondashboardState extends State<Buttondashboard> {
             SharedPreferences prefs = await SharedPreferences.getInstance();
             bool? result = prefs.getBool('presensiMasuk');
             print(result);
-            setState(() {
-              presensiMasuk = result!;
-            });
+            if (mounted) {
+              setState(() {
+                presensiMasuk = result!;
+              });
+            }
           });
         },
         text: Text('CHECK IN'),
@@ -69,9 +74,11 @@ class _ButtondashboardState extends State<Buttondashboard> {
             ),
             builder: (BuildContext context) => BottomSheetCheckOut(),
           ).then((value) async {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.remove('presensiMasuk');
-          setState(() {});
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            prefs.remove('presensiMasuk');
+            if (mounted) {
+              setState(() {});
+            }
           });
         },
         text: Text('CHECK OUT'),

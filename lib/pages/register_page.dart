@@ -57,7 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -65,6 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -89,7 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -97,6 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -120,7 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
       print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -128,6 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -199,7 +202,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 _state = false;
               });
               showTopSnackBar(
-                Overlay.of(context)!,
+                Overlay.of(context),
                 CustomSnackBar.error(
                   message: responseDataEmail!,
                 ),
@@ -210,7 +213,7 @@ class _RegisterPageState extends State<RegisterPage> {
               _state = false;
             });
             showTopSnackBar(
-              Overlay.of(context)!,
+              Overlay.of(context),
               CustomSnackBar.error(
                 message: responseDataKaryawan!,
               ),
@@ -221,7 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
             _state = false;
           });
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             const CustomSnackBar.error(
               message: 'Password Tidak Sama',
             ),
@@ -362,11 +365,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                     Border.all(color: const Color(0xFF4285F4))),
                             child: AbsensiButton(
                               onPressed: () {
-                                Navigator.pushReplacement(
+                                Navigator.pushAndRemoveUntil(
                                     context,
                                     CupertinoPageRoute(
                                         builder: (context) =>
-                                            const LoginPage()));
+                                            const LoginPage()),(route) => false,);
                               },
                               text: Text('LOGIN'),
                               color: Colors.white,

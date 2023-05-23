@@ -5,13 +5,10 @@ import 'package:absensi/widget/absensi_jam_realtime.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
 import 'package:absensi/apiLoc/location_service.dart';
 import 'package:absensi/apiLoc/user_location.dart';
-import 'package:absensi/widget/absensi_button.dart';
 import 'package:absensi/widget/absensi_jam.dart';
-import 'package:absensi/widget/bottom_sheet_checkin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});

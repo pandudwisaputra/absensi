@@ -71,7 +71,7 @@ class _VerifikasiState extends State<Verifikasi> {
       } else {}
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -79,6 +79,7 @@ class _VerifikasiState extends State<Verifikasi> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -103,7 +104,7 @@ class _VerifikasiState extends State<Verifikasi> {
       print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -111,6 +112,7 @@ class _VerifikasiState extends State<Verifikasi> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -147,7 +149,7 @@ class _VerifikasiState extends State<Verifikasi> {
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -155,6 +157,7 @@ class _VerifikasiState extends State<Verifikasi> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -344,8 +347,8 @@ class _VerifikasiState extends State<Verifikasi> {
               email: widget.emailRegister,
               nama: widget.namaRegister,
               password: widget.passwordRegister);
-          await Navigator.pushReplacement(
-              context, CupertinoPageRoute(builder: (context) => Navbar()));
+          await Navigator.pushAndRemoveUntil(
+              context, CupertinoPageRoute(builder: (context) => Navbar()),(route) => false,);
           setState(() {
             _state = false;
           });
@@ -354,7 +357,7 @@ class _VerifikasiState extends State<Verifikasi> {
             _state = false;
           });
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             CustomSnackBar.error(
               message: responseDataOtp!,
             ),
@@ -365,7 +368,7 @@ class _VerifikasiState extends State<Verifikasi> {
           _state = false;
         });
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: responseDataOtp!,
           ),
@@ -376,7 +379,7 @@ class _VerifikasiState extends State<Verifikasi> {
         _state = false;
       });
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: 'Kode Verifikasi Kosong',
         ),

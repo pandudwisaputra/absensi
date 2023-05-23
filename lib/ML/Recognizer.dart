@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:image/image.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
-import 'Recognition.dart';
+import '../model/Recognition.dart';
 
 class Recognizer {
   late Interpreter interpreter;

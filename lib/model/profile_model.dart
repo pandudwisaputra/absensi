@@ -71,14 +71,15 @@ class Data {
       };
 }
 
-class ProfileRepository{
+class ProfileRepository {
   static Future<ProfileModel?> getProfile(BuildContext context) async {
     ProfileModel? _profil;
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? baseUrl = prefs.getString('server');
       int? id = prefs.getInt('idPegawai');
-      var response = await http.get(Uri.parse('$baseUrl/profile/$id'), headers: {
+      var response =
+          await http.get(Uri.parse('$baseUrl/profile/$id'), headers: {
         'X-API-Key': "12345678",
         'Accept': "application/json",
       });
@@ -86,14 +87,12 @@ class ProfileRepository{
       if (response.statusCode == 200) {
         ProfileModel decode = ProfileModel.fromJson(jsonDecode(response.body));
         _profil = decode;
-        SharedPreferences prefs =
-                  await SharedPreferences.getInstance();
-              await prefs.setString(
-                  'email', decode.data.email);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('email', decode.data.email);
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -101,6 +100,7 @@ class ProfileRepository{
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
     return _profil;

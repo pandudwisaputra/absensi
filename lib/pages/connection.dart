@@ -54,11 +54,12 @@ class _ConnectionPageState extends State<ConnectionPage> {
               widget.button == true
                   ? RawMaterialButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        Navigator.pushAndRemoveUntil(
                           context,
                           CupertinoPageRoute(
                             builder: (context) => LoginPage(),
                           ),
+                          (route) => false,
                         );
                       },
                       fillColor: const Color(0xFF4285F4),

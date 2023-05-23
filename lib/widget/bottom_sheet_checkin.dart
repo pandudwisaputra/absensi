@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:absensi/widget/loading_presensi.dart';
-import 'package:absensi/pages/home/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:absensi/model/name_location.dart';
@@ -83,7 +82,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
       responsePresensiMasuk = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -91,6 +90,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -338,9 +338,8 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? radius = prefs.getInt('radius');
     if (radius != null) {
-      
       if (radiusUser <= radius) {
-        PleaseWait(context);
+        pleaseWait(context);
         XFile? file = await getImage(context);
         File resultFile = File(file!.path);
         String linkProfile = await uploadImage(resultFile);
@@ -351,7 +350,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
           prefs.setBool('presensiMasuk', true);
           Navigator.pop(context, true);
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             CustomSnackBar.success(
               message: 'Berhasil Checkin',
             ),
@@ -359,7 +358,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
           Navigator.pop(context, true);
         } else {
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             CustomSnackBar.error(
               message: 'Terjadi Kesalahan',
             ),
@@ -367,7 +366,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
         }
       } else {
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: 'Mohon Memasuki Radius $radius m',
           ),
@@ -375,7 +374,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
       }
     } else {
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: 'Terjadi Kesalahan',
         ),

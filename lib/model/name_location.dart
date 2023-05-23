@@ -45,14 +45,16 @@ class LocationRepository {
       place = placeName[0].street;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
             button: true,
             error: error,
           ),
+          
         ),
+        (route) => false,
       );
     }
     return LocationModel(

@@ -1,7 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print
 
-import 'package:absensi/ML/Recognition.dart';
-import 'package:absensi/ML/Recognizer.dart';
+import 'package:absensi/model/Recognition.dart';
+import 'package:absensi/ml/Recognizer.dart';
+import 'package:absensi/widget/absensi_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -15,14 +16,14 @@ Future<List<CameraDescription>> getAvailableCameras() async {
 
 late List<CameraDescription> cameras;
 
-class FaceRecognitionPage extends StatefulWidget {
-  const FaceRecognitionPage({Key? key}) : super(key: key);
+class AddFaceRecognitionPage extends StatefulWidget {
+  const AddFaceRecognitionPage({Key? key}) : super(key: key);
 
   @override
-  _FaceRecognitionPageState createState() => _FaceRecognitionPageState();
+  _AddFaceRecognitionPageState createState() => _AddFaceRecognitionPageState();
 }
 
-class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
+class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
   dynamic controller;
   bool isBusy = false;
   late Size size;
@@ -85,10 +86,12 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
     print("NUMBER OF FACES =*==*==*==*==*==*=>${faces.length}");
     // perform face recognition on detected faces
     performFaceRecognition(faces);
-    setState(() {
-      isBusy = false;
-      _scanResults = recognitions;
-    });
+    if (mounted) {
+      setState(() {
+        isBusy = false;
+        _scanResults = recognitions;
+      });
+    }
   }
 
   img.Image? image;
@@ -126,11 +129,12 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
         register = false;
       }
     }
-
-    setState(() {
-      isBusy = false;
-      _scanResults = recognitions;
-    });
+    if (mounted) {
+      setState(() {
+        isBusy = false;
+        _scanResults = recognitions;
+      });
+    }
   }
 
   // Face Registration Dialogue
@@ -355,39 +359,45 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
 
     // View for displaying the bar to switch camera direction or for registering faces
     stackChildren.add(Positioned(
-      top: size.height - 140,
-      left: 0,
-      width: size.width,
-      height: 80,
-      child: Card(
-        margin: const EdgeInsets.only(left: 20, right: 20),
-        color: Colors.blue,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.face_retouching_natural,
-                      color: Colors.white,
-                    ),
-                    iconSize: 40,
-                    color: Colors.black,
-                    onPressed: () {
-                      register = true;
-                    },
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    ));
+        top: size.height - 140,
+        left: 0,
+        width: size.width,
+        height: 80,
+        child: AbsensiButton(
+          onPressed: () => register = true,
+          text: Text('Submit'),
+          textColor: Colors.white,
+          color: Color(0xFF4285F4),
+        )
+        // Card(
+        //   margin: const EdgeInsets.only(left: 20, right: 20),
+        //   color: Colors.blue,
+        //   child: Center(
+        //     child: Column(
+        //       mainAxisAlignment: MainAxisAlignment.center,
+        //       crossAxisAlignment: CrossAxisAlignment.center,
+        //       children: [
+        //         Row(
+        //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //           children: [
+        //             IconButton(
+        //               icon: const Icon(
+        //                 Icons.face_retouching_natural,
+        //                 color: Colors.white,
+        //               ),
+        //               iconSize: 40,
+        //               color: Colors.black,
+        //               onPressed: () {
+        //                 register = true;
+        //               },
+        //             )
+        //           ],
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        ));
 
     return SafeArea(
       child: Scaffold(

@@ -50,7 +50,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
       print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -58,6 +58,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -94,7 +95,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -102,6 +103,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -123,7 +125,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -131,6 +133,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }
@@ -335,7 +338,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
             _state = false;
           });
           showTopSnackBar(
-            Overlay.of(context)!,
+            Overlay.of(context),
             CustomSnackBar.error(
               message: responseDataOtp!,
             ),
@@ -346,7 +349,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
           _state = false;
         });
         showTopSnackBar(
-          Overlay.of(context)!,
+          Overlay.of(context),
           CustomSnackBar.error(
             message: responseDataOtp!,
           ),
@@ -357,7 +360,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
         _state = false;
       });
       showTopSnackBar(
-        Overlay.of(context)!,
+        Overlay.of(context),
         CustomSnackBar.error(
           message: 'Kode Verifikasi Kosong',
         ),

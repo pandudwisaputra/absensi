@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -57,7 +56,8 @@ class RiwayatRepository {
     String? baseurl = prefs.getString('server');
     int? id = prefs.getInt('idPegawai');
     try {
-      var response = await http.get(Uri.parse('$baseurl/riwayatpresensi/$id'), headers: {
+      var response =
+          await http.get(Uri.parse('$baseurl/riwayatpresensi/$id'), headers: {
         'X-API-Key': "12345678",
         'Accept': "application/json",
       });
@@ -69,12 +69,12 @@ class RiwayatRepository {
             it.map((e) => RiwayatModel.fromJson(e)).toList();
         return listRiwayat;
       } else {
-        List<RiwayatModel> listRiwayat =[];
+        List<RiwayatModel> listRiwayat = [];
         return listRiwayat;
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -82,6 +82,7 @@ class RiwayatRepository {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
   }

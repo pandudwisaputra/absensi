@@ -103,7 +103,7 @@ class OfficeRepository {
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushReplacement(
+      await Navigator.pushAndRemoveUntil(
         context,
         CupertinoPageRoute(
           builder: (context) => ConnectionPage(
@@ -111,6 +111,7 @@ class OfficeRepository {
             error: error,
           ),
         ),
+        (route) => false,
       );
     }
     return _office;
