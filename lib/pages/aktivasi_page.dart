@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:absensi/model/checkkaryawan_model.dart';
+import 'package:absensi/pages/buatkatasandibaru_page.dart';
 import 'package:absensi/pages/login_page.dart';
-import 'package:absensi/pages/verif_page.dart';
 import 'package:absensi/widget/absensi_button.dart';
 import 'package:absensi/widget/absensi_textfield.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,40 +15,40 @@ import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import 'connection.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class AktivasiPage extends StatefulWidget {
+  const AktivasiPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<AktivasiPage> createState() => _AktivasiPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _AktivasiPageState extends State<AktivasiPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController emailRegisController = TextEditingController();
-  TextEditingController namaRegisController = TextEditingController();
-  TextEditingController passRegisController = TextEditingController();
-  TextEditingController konfirPassController = TextEditingController();
-  int? responseEmailCheck;
-  String? responseDataEmail;
-  int? responseSendOtp;
+  TextEditingController emailAktivasiController = TextEditingController();
+  TextEditingController kodeAktivasiController = TextEditingController();
   int? responseKaryawanCheck;
   String? responseDataKaryawan;
+  int? responseUserCheck;
+  String? responseDataUser;
   bool _state = false;
+  CheckKaryawanModel? dataKaryawan;
 
-  Future<void> karyawanCheck({required String email}) async {
+  Future<void> karyawanCheck(
+      {required String email, required String idKaryawan}) async {
     try {
       SharedPreferences server = await SharedPreferences.getInstance();
       String? baseUrl = server.getString('server');
-      var response =
-          await http.get(Uri.parse('$baseUrl/karyawancheck/$email'), headers: {
-        'X-API-Key': "12345678",
-        'Accept': "application/json",
-      });
+      var response = await http.get(
+          Uri.parse('$baseUrl/karyawancheck/$email/$idKaryawan'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
       print(response.body);
       if (response.statusCode == 200) {
-        var decode = CheckKaryawanModel.fromJson(jsonDecode(response.body));
+        dataKaryawan = CheckKaryawanModel.fromJson(jsonDecode(response.body));
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('idKaryawan', decode.data.idKaryawan);
+        prefs.setString('idKaryawan', dataKaryawan!.data.idKaryawan);
         responseKaryawanCheck = response.statusCode;
       } else {
         var decode = FalseModel.fromJson(jsonDecode(response.body));
@@ -70,56 +70,25 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
-  Future<void> emailCheck({required String email}) async {
+  Future<void> userCheck(
+      {required String email, required String idKaryawan}) async {
     try {
       SharedPreferences server = await SharedPreferences.getInstance();
       String? baseUrl = server.getString('server');
 
-      var response =
-          await http.get(Uri.parse('$baseUrl/emailcheck/$email'), headers: {
+      var response = await http
+          .get(Uri.parse('$baseUrl/usercheck/$email/$idKaryawan'), headers: {
         'X-API-Key': "12345678",
         'Accept': "application/json",
       });
       print(response.body);
       if (response.statusCode == 200) {
-        responseEmailCheck = response.statusCode;
+        responseUserCheck = response.statusCode;
       } else {
         var decode = FalseModel.fromJson(jsonDecode(response.body));
-        responseEmailCheck = decode.code;
-        responseDataEmail = decode.data;
+        responseUserCheck = decode.code;
+        responseDataUser = decode.data;
       }
-    } catch (e) {
-      var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(
-          builder: (context) => ConnectionPage(
-            button: true,
-            error: error,
-          ),
-        ),
-        (route) => false,
-      );
-    }
-  }
-
-  Future<void> sendOtp({required String email}) async {
-    try {
-      SharedPreferences server = await SharedPreferences.getInstance();
-      String? baseUrl = server.getString('server');
-      final msg = jsonEncode(
-        {
-          "email": email,
-        },
-      );
-      var response = await http.post(Uri.parse('$baseUrl/sendotp'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          },
-          body: msg);
-      responseSendOtp = response.statusCode;
-      print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(
@@ -137,12 +106,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    bool validateName(String value) {
-      String pattern = r'^[a-zA-Z\s]+$';
-      RegExp regex = new RegExp(pattern);
-      return regex.hasMatch(value);
-    }
-
     bool validateEmail(String email) {
       String pattern =
           r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
@@ -152,62 +115,35 @@ class _RegisterPageState extends State<RegisterPage> {
       return regex.hasMatch(email);
     }
 
-    void onPressRegister(BuildContext context) async {
+    void onPressAktivasi(BuildContext context) async {
       if (_formKey.currentState!.validate()) {
         setState(() {
           _state = true;
         });
-        if (passRegisController.text == konfirPassController.text) {
+        await karyawanCheck(
+            email: emailAktivasiController.text,
+            idKaryawan: kodeAktivasiController.text);
+        print(responseKaryawanCheck);
+        if (responseKaryawanCheck == 200) {
           setState(() {
             _state = true;
           });
-          await karyawanCheck(email: emailRegisController.text);
-          print(responseKaryawanCheck);
-          if (responseKaryawanCheck == 200) {
+          await userCheck(
+              email: emailAktivasiController.text,
+              idKaryawan: kodeAktivasiController.text);
+          if (responseUserCheck == 200) {
             setState(() {
               _state = true;
             });
-            await emailCheck(email: emailRegisController.text);
-            if (responseEmailCheck == 200) {
-              setState(() {
-                _state = true;
-              });
-              await sendOtp(email: emailRegisController.text);
-              List<String> kata = namaRegisController.text.split(" ");
-              String namaCapitalize = "";
-
-              for (String kataSekarang in kata) {
-                namaCapitalize += kataSekarang[0].toUpperCase() +
-                    kataSekarang.substring(1).toLowerCase() +
-                    " ";
-              }
-              if (responseSendOtp == 200) {
-                setState(() {
-                  _state = true;
-                });
-                await Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => Verifikasi(
-                              emailRegister: emailRegisController.text,
-                              namaRegister: namaCapitalize,
-                              passwordRegister: passRegisController.text,
-                            )));
-                setState(() {
-                  _state = false;
-                });
-              }
-            } else {
-              setState(() {
-                _state = false;
-              });
-              showTopSnackBar(
-                Overlay.of(context),
-                CustomSnackBar.error(
-                  message: responseDataEmail!,
-                ),
-              );
-            }
+            await Navigator.push(
+              context,
+              CupertinoPageRoute(
+                builder: (context) => BuatKataSandiBaru(dataKaryawan: dataKaryawan!,),
+              ),
+            );
+            setState(() {
+              _state = false;
+            });
           } else {
             setState(() {
               _state = false;
@@ -215,7 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
             showTopSnackBar(
               Overlay.of(context),
               CustomSnackBar.error(
-                message: responseDataKaryawan!,
+                message: responseDataUser!,
               ),
             );
           }
@@ -225,8 +161,8 @@ class _RegisterPageState extends State<RegisterPage> {
           });
           showTopSnackBar(
             Overlay.of(context),
-            const CustomSnackBar.error(
-              message: 'Password Tidak Sama',
+            CustomSnackBar.error(
+              message: responseDataKaryawan!,
             ),
           );
         }
@@ -240,7 +176,7 @@ class _RegisterPageState extends State<RegisterPage> {
     Widget setUpButtonChild() {
       if (_state == false) {
         return new Text(
-          "REGISTER",
+          "AKTIVASI",
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16.0,
@@ -270,7 +206,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: Text(
-                    'Register',
+                    'Aktivasi',
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 30,
@@ -285,22 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         children: [
                           AbsensiTextfield(
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Harus Diisi';
-                              } else if (!validateName(value)) {
-                                return 'Nama Hanya Boleh Mengandung Huruf Dan Spasi';
-                              }
-                              return null;
-                            },
-                            controller: namaRegisController,
-                            hintText: 'Nama',
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          AbsensiTextfield(
-                              controller: emailRegisController,
+                              controller: emailAktivasiController,
                               hintText: 'Email',
                               validator: (value) {
                                 if (value!.isEmpty) {
@@ -317,39 +238,18 @@ class _RegisterPageState extends State<RegisterPage> {
                             validator: (value) {
                               if (value!.isEmpty) {
                                 return 'Harus Diisi';
-                              } else if (value.length < 8) {
-                                return 'Password Minimal 8 Karakter';
                               }
                               return null;
                             },
-                            controller: passRegisController,
-                            hintText: 'Password',
-                            obscureText: true,
-                            obscuringCharacter: '*',
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          AbsensiTextfield(
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Harus Diisi';
-                              } else if (value.length < 8) {
-                                return 'Password Minimal 8 Karakter';
-                              }
-                              return null;
-                            },
-                            controller: konfirPassController,
-                            hintText: 'Konfirmasi Password',
-                            obscureText: true,
-                            obscuringCharacter: '*',
+                            controller: kodeAktivasiController,
+                            hintText: 'Kode Pegawai',
                           ),
                           const SizedBox(
                             height: 30,
                           ),
                           AbsensiButton(
                             onPressed: () {
-                              onPressRegister(context);
+                              onPressAktivasi(context);
                             },
                             text: setUpButtonChild(),
                             textColor: Colors.white,
@@ -366,10 +266,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             child: AbsensiButton(
                               onPressed: () {
                                 Navigator.pushAndRemoveUntil(
-                                    context,
-                                    CupertinoPageRoute(
-                                        builder: (context) =>
-                                            const LoginPage()),(route) => false,);
+                                  context,
+                                  CupertinoPageRoute(
+                                      builder: (context) => const LoginPage()),
+                                  (route) => false,
+                                );
                               },
                               text: Text('LOGIN'),
                               color: Colors.white,

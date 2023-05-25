@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../helper/exception_handler.dart';
-import '../model/register_model.dart';
+import '../model/aktivasi_model.dart';
 import 'connection.dart';
 
 class Verifikasi extends StatefulWidget {
@@ -60,10 +60,10 @@ class _VerifikasiState extends State<Verifikasi> {
           },
           body: msg);
       print(response.body);
-      var decode = RegisterModel.fromJson(jsonDecode(response.body));
+      var decode = AktivasiModel.fromJson(jsonDecode(response.body));
       setState(() => responseRegister = decode.code);
       if (response.statusCode == 200) {
-        var decodeId = RegisterModel.fromJson(jsonDecode(response.body));
+        var decodeId = AktivasiModel.fromJson(jsonDecode(response.body));
         int idPegawai = decodeId.data.idUser;
         print('id pegawai = $idPegawai');
         SharedPreferences prefsId = await SharedPreferences.getInstance();

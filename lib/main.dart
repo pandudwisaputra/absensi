@@ -8,7 +8,6 @@ import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
@@ -24,7 +23,9 @@ void main() async {
   await initializeDateFormatting('id_ID', null)
       .then((_) => runApp(const MyApp()));
   SharedPreferences server = await SharedPreferences.getInstance();
-  await server.setString('server', 'http://103.174.114.128:4000/api');
+  await server.setString(
+      'server', 'https://3863-103-184-180-97.ngrok-free.app/api');
+  // await server.setString('server', 'http://103.174.114.128:4000/api');
 }
 
 class MyApp extends StatefulWidget {

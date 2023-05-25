@@ -20,19 +20,18 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   LocationService locationService = LocationService();
   GoogleMapController? mapController;
-  bool presensiMasuk = false;
 
   String greetingMessage() {
     var timeNow = DateTime.now().hour;
 
     if (timeNow < 12) {
-      return 'Selamat Pagi';
-    } else if ((timeNow >= 12) && (timeNow < 16)) {
-      return 'Selamat Siang';
-    } else if ((timeNow >= 16) && (timeNow < 20)) {
-      return 'Selamat Sore';
+      return 'Selamat Pagi 👋';
+    } else if ((timeNow >= 12) && (timeNow < 15)) {
+      return 'Selamat Siang 👋';
+    } else if ((timeNow >= 15) && (timeNow <= 18)) {
+      return 'Selamat Sore 👋';
     } else {
-      return 'Selamat Malam';
+      return 'Selamat Malam 👋';
     }
   }
 

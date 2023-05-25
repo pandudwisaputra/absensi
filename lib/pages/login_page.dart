@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:absensi/pages/lupakatasandi_page.dart';
-import 'package:absensi/pages/register_page.dart';
+import 'package:absensi/pages/aktivasi_page.dart';
 import 'package:absensi/widget/absensi_button.dart';
 import 'package:absensi/widget/absensi_textfield.dart';
 import 'package:absensi/pages/home/navbar.dart';
@@ -79,12 +79,12 @@ class _LoginPageState extends State<LoginPage> {
 
     void onPressLogin(BuildContext context) async {
       if (_formKey.currentState!.validate()) {
-        if(mounted){
+        if (mounted) {
           setState(() {
-          _state = true;
-        });
+            _state = true;
+          });
         }
-        
+
         await loginPegawai(
           email: emailcontroller.text,
           password: passcontroller.text,
@@ -93,8 +93,11 @@ class _LoginPageState extends State<LoginPage> {
           setState(() {
             _state = true;
           });
-          await Navigator.pushAndRemoveUntil(context,
-              CupertinoPageRoute(builder: (context) => const Navbar()),(route) => false,);
+          await Navigator.pushAndRemoveUntil(
+            context,
+            CupertinoPageRoute(builder: (context) => const Navbar()),
+            (route) => false,
+          );
           setState(() {
             _state = false;
           });
@@ -234,12 +237,13 @@ class _LoginPageState extends State<LoginPage> {
                           child: AbsensiButton(
                             onPressed: () {
                               Navigator.pushAndRemoveUntil(
-                                  context,
-                                  CupertinoPageRoute(
-                                      builder: (context) =>
-                                          const RegisterPage()),(route) => false,);
+                                context,
+                                CupertinoPageRoute(
+                                    builder: (context) => const AktivasiPage()),
+                                (route) => false,
+                              );
                             },
-                            text: Text('REGISTER'),
+                            text: Text('AKTIVASI'),
                             color: Colors.white,
                             textColor: Color(0xFF4285F4),
                           )),

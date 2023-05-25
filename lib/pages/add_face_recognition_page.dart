@@ -1,7 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print
 
-import 'package:absensi/model/Recognition.dart';
-import 'package:absensi/ml/Recognizer.dart';
+import 'package:absensi/model/recognition.dart';
+import 'package:absensi/ml/recognizer.dart';
 import 'package:absensi/widget/absensi_button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -363,11 +363,14 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
         left: 0,
         width: size.width,
         height: 80,
-        child: AbsensiButton(
-          onPressed: () => register = true,
-          text: Text('Submit'),
-          textColor: Colors.white,
-          color: Color(0xFF4285F4),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: AbsensiButton(
+            onPressed: () => register = true,
+            text: Text('Submit'),
+            color: Colors.white,
+            textColor: Color(0xFF4285F4),
+          ),
         )
         // Card(
         //   margin: const EdgeInsets.only(left: 20, right: 20),

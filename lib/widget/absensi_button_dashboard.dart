@@ -13,7 +13,7 @@ class Buttondashboard extends StatefulWidget {
 }
 
 class _ButtondashboardState extends State<Buttondashboard> {
-  bool presensiMasuk = false;
+  bool? presensiMasuk;
 
   @override
   void initState() {
@@ -22,7 +22,7 @@ class _ButtondashboardState extends State<Buttondashboard> {
     loadlist();
   }
 
-  Future loadlist() async {
+  Future<void> loadlist() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool? result = prefs.getBool('presensiMasuk');
     if (mounted) {
@@ -30,33 +30,124 @@ class _ButtondashboardState extends State<Buttondashboard> {
         presensiMasuk = result!;
       });
     }
-
-    print('Status : $presensiMasuk');
   }
 
   @override
   Widget build(BuildContext context) {
-    if (presensiMasuk == false) {
-      return AbsensiButton(
-        onPressed: () async {
-          showModalBottomSheet(
-            context: context,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(25),
+    Future<void> showSuccessDialog() async {
+      return showDialog(
+        context: context,
+        builder: (BuildContext context) => SizedBox(
+          width: MediaQuery.of(context).size.width - (2 * 30),
+          child: AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Pilih Keterangan',
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 44,
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              showModalBottomSheet(
+                                context: context,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(25),
+                                  ),
+                                ),
+                                builder: (BuildContext context) =>
+                                    BottomSheetCheckIn(),
+                              ).then((value) async {
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                bool? result = prefs.getBool('presensiMasuk');
+                                print(result);
+                                if (mounted) {
+                                  setState(() {
+                                    presensiMasuk = result!;
+                                  });
+                                }
+                              });
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Masuk',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: SizedBox(
+                          height: 44,
+                          child: TextButton(
+                            onPressed: () {},
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Tidak Masuk',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            builder: (BuildContext context) => BottomSheetCheckIn(),
-          ).then((value) async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            bool? result = prefs.getBool('presensiMasuk');
-            print(result);
-            if (mounted) {
-              setState(() {
-                presensiMasuk = result!;
-              });
-            }
-          });
+          ),
+        ),
+      );
+    }
+
+    if (presensiMasuk == null) {
+      return AbsensiButton(
+        onPressed: () {
+          showSuccessDialog();
         },
         text: Text('CHECK IN'),
         color: Color(0xFF00AC47),
