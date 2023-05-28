@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:absensi/model/presensi_model.dart';
+import 'package:absensi/pages/home/navbar.dart';
 import 'package:absensi/widget/loading_presensi.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -7,15 +8,12 @@ import 'package:absensi/model/name_location.dart';
 import 'package:absensi/model/office_model.dart';
 import 'package:absensi/widget/absensi_jam_realtime.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
-import 'package:path/path.dart';
 import '../helper/exception_handler.dart';
 import '../pages/connection.dart';
 import 'absensi_button.dart';
@@ -31,30 +29,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
   int? radiusUser;
   int? responsePresensiMasuk;
 
-  static Future<String> uploadImage(File imageFile) async {
-    String fileName = basename(imageFile.path);
-    Reference ref = FirebaseStorage.instance.ref().child('selfie/$fileName');
-    UploadTask task = ref.putFile(
-        imageFile,
-        SettableMetadata(
-            contentType: 'image/jpeg',
-            customMetadata: {'picked-file-path': fileName}));
-    TaskSnapshot snapshot = await task;
-
-    return await snapshot.ref.getDownloadURL();
-  }
-
-  Future<XFile?> getImage(BuildContext context) async {
-    final pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.camera, preferredCameraDevice: CameraDevice.front);
-    if (pickedFile == null) {
-      Navigator.pop(context);
-    }
-    return pickedFile;
-  }
-
-  Future<void> presensiMasuk(
-      {required BuildContext context, required String selfie}) async {
+  Future<void> presensiMasuk({required BuildContext context}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? baseUrl = prefs.getString('server');
@@ -69,7 +44,6 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
         "tanggal_presensi": tanggalPresensi,
         "latitude": userLatitude,
         "longitude": userLongitude,
-        "selfie": selfie,
         "alamat": userLocation
       });
       var response = await http.post(Uri.parse('$baseUrl/presensimasuk'),
@@ -80,6 +54,12 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
           body: msg);
       print(response.body);
       responsePresensiMasuk = response.statusCode;
+      if (response.statusCode == 200) {
+        PresensiModel _presensi =
+            PresensiModel.fromJson(jsonDecode(response.body));
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('idPresensi', _presensi.data.idPresensi);
+      }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(
@@ -340,14 +320,8 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
     if (radius != null) {
       if (radiusUser <= radius) {
         pleaseWait(context);
-        XFile? file = await getImage(context);
-        File resultFile = File(file!.path);
-        String linkProfile = await uploadImage(resultFile);
-        print('link foto profil : $linkProfile');
-        await presensiMasuk(context: context, selfie: linkProfile);
+        await presensiMasuk(context: context);
         if (responsePresensiMasuk == 200) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.setBool('presensiMasuk', true);
           Navigator.pop(context, true);
           showTopSnackBar(
             Overlay.of(context),
@@ -355,7 +329,11 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
               message: 'Berhasil Checkin',
             ),
           );
-          Navigator.pop(context, true);
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: ((context) => Navbar())),
+            (route) => false,
+          );
         } else {
           showTopSnackBar(
             Overlay.of(context),

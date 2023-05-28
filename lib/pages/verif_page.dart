@@ -14,13 +14,11 @@ import 'connection.dart';
 
 class Verifikasi extends StatefulWidget {
   final String emailRegister;
-  final String namaRegister;
   final String passwordRegister;
 
   const Verifikasi({
     super.key,
     required this.emailRegister,
-    required this.namaRegister,
     required this.passwordRegister,
   });
 
@@ -39,7 +37,6 @@ class _VerifikasiState extends State<Verifikasi> {
 
   Future<void> registerPegawai(
       {required String email,
-      required String nama,
       required String password}) async {
     SharedPreferences server = await SharedPreferences.getInstance();
     String? baseUrl = server.getString('server');
@@ -49,7 +46,6 @@ class _VerifikasiState extends State<Verifikasi> {
         {
           "id_karyawan": idKaryawan,
           "email": email,
-          "nama": nama,
           "password": password,
         },
       );
@@ -345,7 +341,6 @@ class _VerifikasiState extends State<Verifikasi> {
           });
           await registerPegawai(
               email: widget.emailRegister,
-              nama: widget.namaRegister,
               password: widget.passwordRegister);
           await Navigator.pushAndRemoveUntil(
               context, CupertinoPageRoute(builder: (context) => Navbar()),(route) => false,);

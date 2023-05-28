@@ -34,18 +34,22 @@ class _ProfilePageState extends State<ProfilePage> {
     Reference ref =
         FirebaseStorage.instance.ref().child('profile_picture/$fileName');
     UploadTask task = ref.putFile(
-        imageFile,
-        SettableMetadata(
-            contentType: 'image/jpeg',
-            customMetadata: {'picked-file-path': fileName}));
+      imageFile,
+      SettableMetadata(
+        contentType: 'image/jpeg/png',
+        customMetadata: {'picked-file-path': fileName},
+      ),
+    );
     TaskSnapshot snapshot = await task;
 
     return await snapshot.ref.getDownloadURL();
   }
 
   Future<XFile?> getImage(BuildContext context) async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+    );
     if (pickedFile == null) {
       Navigator.pop(context);
     }

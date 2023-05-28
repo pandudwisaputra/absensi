@@ -46,6 +46,7 @@ class Data {
     required this.email,
     required this.noHp,
     required this.pendidikan,
+    required this.jabatan,
   });
 
   String idKaryawan;
@@ -57,6 +58,7 @@ class Data {
   String email;
   String noHp;
   String pendidikan;
+  String jabatan;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         idKaryawan: json["id_karyawan"],
@@ -68,6 +70,7 @@ class Data {
         email: json["email"],
         noHp: json["no_hp"],
         pendidikan: json["pendidikan"],
+        jabatan: json["jabatan"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -80,5 +83,7 @@ class Data {
         "email": email,
         "no_hp": noHp,
         "pendidikan": pendidikan,
+        "jabatan": jabatan,
       };
 }
+

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:absensi/helper/exception_handler.dart';
-import 'package:absensi/model/checkkaryawan_model.dart';
+import 'package:absensi/model/check_karyawan_model.dart';
 import 'package:absensi/pages/connection.dart';
 import 'package:absensi/pages/verif_page.dart';
 import 'package:http/http.dart' as http;
@@ -80,7 +80,6 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                 CupertinoPageRoute(
                     builder: (context) => Verifikasi(
                           emailRegister: widget.dataKaryawan.data.email,
-                          namaRegister: widget.dataKaryawan.data.namaLengkap,
                           passwordRegister: passAktivasiController.text,
                         )));
             setState(() {
@@ -136,30 +135,39 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Center(
-                    child: Text(
-                      'Buat Kata Sandi',
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 30,
-                        fontWeight: FontWeight.w700,
-                      ),
+                SizedBox(),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.only(left: 30, right: 30),
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Color(0x24000000),
                     ),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30, right: 30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Center(
+                        child: Text(
+                          'Data Pegawai',
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
                       const Text(
-                        'Nama Lengkap',
+                        'Nama Lengkap :',
                         style: TextStyle(
                             fontFamily: 'Open Sans',
-                            fontSize: 11,
-                            color: Colors.grey),
+                            fontSize: 15,
+                            color: Color(0xFFA8A8A8)),
                       ),
                       const SizedBox(
                         height: 3,
@@ -167,7 +175,8 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                       Text(
                         widget.dataKaryawan.data.namaLengkap,
                         style: const TextStyle(
-                            fontFamily: 'Open Sans',
+                            fontFamily: 'Inter',
+                            color: Color(0xFF4285F4),
                             fontWeight: FontWeight.w600,
                             fontSize: 15),
                       ),
@@ -175,11 +184,11 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                         height: 10,
                       ),
                       const Text(
-                        'Alamat',
+                        'Alamat :',
                         style: TextStyle(
                             fontFamily: 'Open Sans',
-                            fontSize: 11,
-                            color: Colors.grey),
+                            fontSize: 15,
+                            color: Color(0xFFA8A8A8)),
                       ),
                       const SizedBox(
                         height: 3,
@@ -187,7 +196,8 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                       Text(
                         widget.dataKaryawan.data.alamat,
                         style: const TextStyle(
-                            fontFamily: 'Open Sans',
+                            fontFamily: 'Inter',
+                            color: Color(0xFF4285F4),
                             fontWeight: FontWeight.w600,
                             fontSize: 15),
                       ),
@@ -195,31 +205,11 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                         height: 10,
                       ),
                       const Text(
-                        'Agama',
+                        'No Hp :',
                         style: TextStyle(
                             fontFamily: 'Open Sans',
-                            fontSize: 11,
-                            color: Colors.grey),
-                      ),
-                      const SizedBox(
-                        height: 3,
-                      ),
-                      Text(
-                        widget.dataKaryawan.data.agama,
-                        style: const TextStyle(
-                            fontFamily: 'Open Sans',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        'No Hp',
-                        style: TextStyle(
-                            fontFamily: 'Open Sans',
-                            fontSize: 11,
-                            color: Colors.grey),
+                            fontSize: 15,
+                            color: Color(0xFFA8A8A8)),
                       ),
                       const SizedBox(
                         height: 3,
@@ -227,7 +217,8 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                       Text(
                         widget.dataKaryawan.data.noHp,
                         style: const TextStyle(
-                            fontFamily: 'Open Sans',
+                            fontFamily: 'Inter',
+                            color: Color(0xFF4285F4),
                             fontWeight: FontWeight.w600,
                             fontSize: 15),
                       ),
@@ -235,19 +226,20 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                         height: 10,
                       ),
                       const Text(
-                        'Pendidikan',
+                        'Jabatan :',
                         style: TextStyle(
                             fontFamily: 'Open Sans',
-                            fontSize: 11,
-                            color: Colors.grey),
+                            fontSize: 15,
+                            color: Color(0xFFA8A8A8)),
                       ),
                       const SizedBox(
                         height: 3,
                       ),
                       Text(
-                        widget.dataKaryawan.data.pendidikan,
+                        widget.dataKaryawan.data.jabatan,
                         style: const TextStyle(
-                            fontFamily: 'Open Sans',
+                            fontFamily: 'Inter',
+                            color: Color(0xFF4285F4),
                             fontWeight: FontWeight.w600,
                             fontSize: 15),
                       ),

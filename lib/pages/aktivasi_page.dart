@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:absensi/model/checkkaryawan_model.dart';
+import 'package:absensi/model/check_karyawan_model.dart';
 import 'package:absensi/pages/buatkatasandibaru_page.dart';
 import 'package:absensi/pages/login_page.dart';
 import 'package:absensi/widget/absensi_button.dart';

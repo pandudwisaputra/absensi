@@ -33,10 +33,12 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? baseUrl = prefs.getString('server');
       int? id = prefs.getInt('idPegawai');
+      int? idPresensi = prefs.getInt('idPresensi');
       String? tanggalPresensi = prefs.getString('tanggalPresensi');
       final msg = jsonEncode({
         "id_user": id,
-        "tanggal_presesnsi": tanggalPresensi,
+        "id_presensi" : idPresensi,
+        "tanggal_presensi": tanggalPresensi,
       });
       print(DateTime.now().millisecondsSinceEpoch.toString());
       var response = await http.put(Uri.parse('$baseUrl/presensikeluar'),
@@ -310,8 +312,6 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
         await presensiKeluar(context: context);
         if (responsePresensiKeluar == 200) {
           Navigator.pop(context);
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          prefs.remove('presensiMasuk');
           showTopSnackBar(
             Overlay.of(context),
             CustomSnackBar.success(

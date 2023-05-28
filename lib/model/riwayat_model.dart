@@ -8,6 +8,7 @@ import '../pages/connection.dart';
 
 class RiwayatModel {
   int idUser;
+  int idPresensi;
   String tanggalPresensi;
   String jamMasuk;
   String jamPulang;
@@ -20,6 +21,7 @@ class RiwayatModel {
   String status;
 
   RiwayatModel({
+    required this.idPresensi,
     required this.idUser,
     required this.tanggalPresensi,
     required this.jamMasuk,
@@ -35,6 +37,7 @@ class RiwayatModel {
 
   factory RiwayatModel.fromJson(Map<String, dynamic> json) {
     return RiwayatModel(
+      idPresensi: json['id_presensi'],
       idUser: json['id_user'],
       tanggalPresensi: json['tanggal_presensi'],
       jamMasuk: json['jam_masuk'],
@@ -63,7 +66,6 @@ class RiwayatRepository {
       });
       print(response.body);
       if (response.statusCode == 200) {
-        print(response.body);
         Iterable it = jsonDecode(response.body)["data"];
         List<RiwayatModel> listRiwayat =
             it.map((e) => RiwayatModel.fromJson(e)).toList();
@@ -87,3 +89,4 @@ class RiwayatRepository {
     }
   }
 }
+

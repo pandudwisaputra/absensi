@@ -1,5 +1,10 @@
+import 'package:absensi/model/presensi_check_model.dart';
+import 'package:absensi/widget/absensi_shimmer.dart';
+import 'package:absensi/widget/bottom_sheet_checkin_tidak_masuk.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 import 'absensi_button.dart';
 import 'bottom_sheet_checkin.dart';
@@ -13,25 +18,6 @@ class Buttondashboard extends StatefulWidget {
 }
 
 class _ButtondashboardState extends State<Buttondashboard> {
-  bool? presensiMasuk;
-
-  @override
-  void initState() {
-    super.initState();
-
-    loadlist();
-  }
-
-  Future<void> loadlist() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? result = prefs.getBool('presensiMasuk');
-    if (mounted) {
-      setState(() {
-        presensiMasuk = result!;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     Future<void> showSuccessDialog() async {
@@ -82,17 +68,7 @@ class _ButtondashboardState extends State<Buttondashboard> {
                                 ),
                                 builder: (BuildContext context) =>
                                     BottomSheetCheckIn(),
-                              ).then((value) async {
-                                SharedPreferences prefs =
-                                    await SharedPreferences.getInstance();
-                                bool? result = prefs.getBool('presensiMasuk');
-                                print(result);
-                                if (mounted) {
-                                  setState(() {
-                                    presensiMasuk = result!;
-                                  });
-                                }
-                              });
+                              );
                             },
                             style: TextButton.styleFrom(
                               backgroundColor: Colors.blue,
@@ -117,7 +93,20 @@ class _ButtondashboardState extends State<Buttondashboard> {
                         child: SizedBox(
                           height: 44,
                           child: TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pop(context);
+                              SizedBox();
+                              showModalBottomSheet(
+                                context: context,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(25),
+                                  ),
+                                ),
+                                builder: (BuildContext context) =>
+                                    BottomSheetCheckInTidakMasuk(),
+                              );
+                            },
                             style: TextButton.styleFrom(
                               backgroundColor: Colors.blue,
                               shape: RoundedRectangleBorder(
@@ -144,38 +133,72 @@ class _ButtondashboardState extends State<Buttondashboard> {
       );
     }
 
-    if (presensiMasuk == null) {
-      return AbsensiButton(
-        onPressed: () {
-          showSuccessDialog();
-        },
-        text: Text('CHECK IN'),
-        color: Color(0xFF00AC47),
-        textColor: Colors.white,
-      );
-    } else {
-      return AbsensiButton(
-        onPressed: () async {
-          showModalBottomSheet(
-            context: context,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(25),
-              ),
-            ),
-            builder: (BuildContext context) => BottomSheetCheckOut(),
-          ).then((value) async {
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            prefs.remove('presensiMasuk');
-            if (mounted) {
-              setState(() {});
+    return FutureBuilder(
+      future: PresensiCheckRepository.getPresensiCheck(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return shimmer(
+            height: 60,
+            width: MediaQuery.of(context).size.width,
+          );
+        } else if (snapshot.hasData) {
+          PresensiCheckModel _presensiCheck = snapshot.data!;
+          int currentMillis = int.parse(_presensiCheck.data.tanggalPresensi);
+          DateTime dateTime =
+              DateTime.fromMillisecondsSinceEpoch(currentMillis);
+          String tanggalPresensi =
+              "${dateTime.day}-${dateTime.month}-${dateTime.year}";
+
+          DateTime now = DateTime.now();
+          String tanggalSekarang = "${now.day}-${now.month}-${now.year}";
+
+          if (_presensiCheck.data.status == 'Selesai') {
+            if (tanggalSekarang != tanggalPresensi) {
+              return AbsensiButton(
+                onPressed: () {
+                  showSuccessDialog();
+                },
+                text: Text('CHECK IN'),
+                color: Color(0xFF00AC47),
+                textColor: Colors.white,
+              );
+            } else {
+              return AbsensiButton(
+                onPressed: () {
+                  showTopSnackBar(
+                    Overlay.of(context),
+                    CustomSnackBar.error(
+                      message: 'Kamu Sudah Presensi Hari Ini',
+                    ),
+                  );
+                },
+                text: Text('CHECK IN'),
+                color: Color(0xFF00AC47),
+                textColor: Colors.white,
+              );
             }
-          });
-        },
-        text: Text('CHECK OUT'),
-        color: Color(0xFFEA4435),
-        textColor: Colors.white,
-      );
-    }
+          } else {
+            return AbsensiButton(
+              onPressed: () async {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(25),
+                    ),
+                  ),
+                  builder: (BuildContext context) => BottomSheetCheckOut(),
+                );
+              },
+              text: Text('CHECK OUT'),
+              color: Color(0xFFEA4435),
+              textColor: Colors.white,
+            );
+          }
+        } else {
+          return SizedBox();
+        }
+      },
+    );
   }
 }
