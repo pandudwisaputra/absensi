@@ -7,6 +7,7 @@ import 'package:absensi/pages/connection.dart';
 import 'package:absensi/pages/data_pegawai_page.dart';
 import 'package:absensi/pages/login_page.dart';
 import 'package:absensi/widget/absensi_button.dart';
+import 'package:absensi/widget/click_image.dart';
 import 'package:absensi/widget/loading_presensi.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -153,15 +154,15 @@ class _ProfilePageState extends State<ProfilePage> {
       {required BuildContext context, required String ava}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
       int? id = prefs.getInt('idPegawai');
       var msg = jsonEncode({"id_user": id, "ava": ava});
-      var response = await http.post(Uri.parse('$baseUrl/updateava'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          },
-          body: msg);
+      var response =
+          await http.post(Uri.parse('http://api.myfin.id:4000/api/updateava'),
+              headers: {
+                'X-API-Key': "12345678",
+                'Accept': "application/json",
+              },
+              body: msg);
       print(response.body);
       responseUpdateAva = response.statusCode;
     } catch (e) {
@@ -353,12 +354,21 @@ class _ProfilePageState extends State<ProfilePage> {
                             Stack(
                               clipBehavior: Clip.none,
                               children: [
-                                CircleAvatar(
-                                  radius: 35,
-                                  backgroundImage: NetworkImage(
-                                    profile.data.avatar == '-'
-                                        ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                        : profile.data.avatar,
+                                GestureDetector(
+                                  onTap: () {
+                                    clickImage(
+                                        context,
+                                        profile.data.avatar == '-'
+                                            ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
+                                            : profile.data.avatar);
+                                  },
+                                  child: CircleAvatar(
+                                    radius: 35,
+                                    backgroundImage: NetworkImage(
+                                      profile.data.avatar == '-'
+                                          ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
+                                          : profile.data.avatar,
+                                    ),
                                   ),
                                 ),
                                 Positioned(
@@ -531,32 +541,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-  // void onPress(BuildContext context) async {
-  //   pleaseWait(context);
-  //   XFile? file = await getImage(context);
-
-  //   File resultFile = File(file!.path);
-  //   String linkProfile = await uploadImage(resultFile);
-  //   print('link foto profil : $linkProfile');
-  //   await updateAva(context: context, ava: linkProfile);
-  //   if (responseUpdateAva == 200) {
-  //     Navigator.pop(context);
-  //     showTopSnackBar(
-  //       Overlay.of(context),
-  //       CustomSnackBar.success(
-  //         message: 'Berhasil',
-  //       ),
-  //     );
-  //     setState(() {});
-  //   } else {
-  //     Navigator.pop(context);
-  //     showTopSnackBar(
-  //       Overlay.of(context),
-  //       CustomSnackBar.error(
-  //         message: 'Terjadi Kesalahan',
-  //       ),
-  //     );
-  //   }
-  // }
 }

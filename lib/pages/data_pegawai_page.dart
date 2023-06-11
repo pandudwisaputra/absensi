@@ -1,6 +1,6 @@
 import 'package:absensi/model/check_karyawan_model.dart';
+import 'package:absensi/model/check_recognition_model.dart';
 import 'package:absensi/pages/add_face_recognition_page.dart';
-import 'package:absensi/pages/clickfoto_page.dart';
 import 'package:absensi/pages/ubah_katasandi_page.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
 import 'package:flutter/cupertino.dart';
@@ -122,30 +122,13 @@ class _DataPegawaiPageState extends State<DataPegawaiPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Center(
-                            child: GestureDetector(
-                              onTap: () {
-                                SystemChrome.setSystemUIOverlayStyle(
-                                    const SystemUiOverlayStyle(
-                                  statusBarColor: Colors.transparent,
-                                ));
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ClickFoto(
-                                              nama: karyawan.data.namaLengkap,
-                                              foto: karyawan.data.foto != '-'
-                                                  ? karyawan.data.foto
-                                                  : 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9',
-                                            )));
-                              },
-                              child: CircleAvatar(
-                                radius: 80,
-                                backgroundImage: NetworkImage(karyawan
-                                            .data.foto !=
-                                        '-'
-                                    ? karyawan.data.foto
-                                    : 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'),
-                              ),
+                            child: CircleAvatar(
+                              radius: 80,
+                              backgroundImage: NetworkImage(karyawan
+                                          .data.foto !=
+                                      '-'
+                                  ? karyawan.data.foto
+                                  : 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'),
                             ),
                           ),
                           const SizedBox(
@@ -262,6 +245,161 @@ class _DataPegawaiPageState extends State<DataPegawaiPage> {
                       return const SizedBox();
                     }
                   }),
+              FutureBuilder(
+                future: RecognitionRepository.getRecognition(context),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        shimmer(
+                          height: 19,
+                          width: 100,
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        shimmer(
+                          height: 50,
+                          width: double.infinity,
+                        ),
+                      ],
+                    );
+                  } else if (snapshot.hasData) {
+                    bool isAvailable = snapshot.data!;
+                    if (isAvailable == true) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Face Recognition',
+                            style: TextStyle(
+                              fontFamily: 'Open Sans',
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 11,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFE7E7FE),
+                              ),
+                            ),
+                            child: const Text(
+                              'Terdaftar',
+                              style: TextStyle(
+                                fontFamily: 'Open Sans',
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Face Recognition',
+                            style: TextStyle(
+                              fontFamily: 'Open Sans',
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 11,
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFE7E7FE),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Belum Terdaftar',
+                                  style: TextStyle(
+                                    fontFamily: 'Open Sans',
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        CupertinoPageRoute(
+                                            builder: (context) =>
+                                                const AddFaceRecognitionPage()));
+                                  },
+                                  child: const Text(
+                                    'Tambah',
+                                    style: TextStyle(
+                                      fontFamily: 'Open Sans',
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFFFFB575),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: const [
+                              Icon(
+                                Icons.warning,
+                                size: 15,
+                                color: Colors.redAccent,
+                              ),
+                              SizedBox(
+                                width: 3,
+                              ),
+                              Flexible(
+                                child: Text(
+                                  'Tambahkan data untuk melakukan presensi',
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                      fontFamily: 'Open Sans',
+                                      fontSize: 12,
+                                      color: Colors.redAccent),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                  } else {
+                    return const SizedBox();
+                  }
+                },
+              ),
+              const SizedBox(
+                height: 14,
+              ),
               const Text(
                 'Password',
                 style: TextStyle(
@@ -315,86 +453,6 @@ class _DataPegawaiPageState extends State<DataPegawaiPage> {
                     )
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 14,
-              ),
-              const Text(
-                'Face Recognition',
-                style: TextStyle(
-                  fontFamily: 'Open Sans',
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 11,
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: const Color(0xFFE7E7FE),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Belum Terdaftar',
-                      style: TextStyle(
-                        fontFamily: 'Open Sans',
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            CupertinoPageRoute(
-                                builder: (context) =>
-                                    const AddFaceRecognitionPage()));
-                      },
-                      child: const Text(
-                        'Tambah',
-                        style: TextStyle(
-                          fontFamily: 'Open Sans',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFFFB575),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Row(
-                children: const [
-                  Icon(
-                    Icons.warning,
-                    size: 15,
-                    color: Colors.redAccent,
-                  ),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  Text(
-                    'Tambahkan data untuk melakukan presensi',
-                    style: TextStyle(
-                        fontFamily: 'Open Sans',
-                        fontSize: 12,
-                        color: Colors.redAccent),
-                  ),
-                ],
               ),
             ],
           ),

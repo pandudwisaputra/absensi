@@ -8,6 +8,7 @@ import 'package:absensi/widget/absensi_button.dart';
 import 'package:absensi/widget/absensi_textfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../helper/exception_handler.dart';
@@ -38,10 +39,10 @@ class _AktivasiPageState extends State<AktivasiPage> {
   Future<void> karyawanCheck(
       {required String email, required String idKaryawan}) async {
     try {
-      SharedPreferences server = await SharedPreferences.getInstance();
-      String? baseUrl = server.getString('server');
+
       var response = await http.get(
-          Uri.parse('$baseUrl/karyawancheck/$email/$idKaryawan'),
+          Uri.parse(
+              'http://api.myfin.id:4000/api/karyawancheck/$email/$idKaryawan'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -75,14 +76,14 @@ class _AktivasiPageState extends State<AktivasiPage> {
   Future<void> userCheck(
       {required String email, required String idKaryawan}) async {
     try {
-      SharedPreferences server = await SharedPreferences.getInstance();
-      String? baseUrl = server.getString('server');
 
-      var response = await http
-          .get(Uri.parse('$baseUrl/usercheck/$email/$idKaryawan'), headers: {
-        'X-API-Key': "12345678",
-        'Accept': "application/json",
-      });
+      var response = await http.get(
+          Uri.parse(
+              'http://api.myfin.id:4000/api/usercheck/$email/$idKaryawan'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
       print(response.body);
       if (response.statusCode == 200) {
         responseUserCheck = response.statusCode;
@@ -291,8 +292,15 @@ class _AktivasiPageState extends State<AktivasiPage> {
       );
     }
 
-    return Scaffold(
-      body: content(),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.white,
+      ),
+      child: Scaffold(
+        body: content(),
+      ),
     );
   }
 }

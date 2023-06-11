@@ -34,8 +34,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
 
   Future<void> sendOtp() async {
     try {
-      SharedPreferences server = await SharedPreferences.getInstance();
-      String? baseUrl = server.getString('server');
+
       SharedPreferences email = await SharedPreferences.getInstance();
       String? emailRegister = email.getString('emailRegister');
       final msg = jsonEncode(
@@ -43,12 +42,13 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
           "email": emailRegister,
         },
       );
-      var response = await http.post(Uri.parse('$baseUrl/sendotp'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          },
-          body: msg);
+      var response =
+          await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
+              headers: {
+                'X-API-Key': "12345678",
+                'Accept': "application/json",
+              },
+              body: msg);
       print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -69,8 +69,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
     required String email,
     required String otp,
   }) async {
-    SharedPreferences server = await SharedPreferences.getInstance();
-    String? baseUrl = server.getString('server');
+
     try {
       final msg = jsonEncode(
         {
@@ -78,7 +77,8 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
           "otp": otp,
         },
       );
-      var response = await http.post(Uri.parse('$baseUrl/otpvalidation'),
+      var response = await http.post(
+          Uri.parse('http://api.myfin.id:4000/api/otpvalidation'),
           headers: {
             "X-API-Key": "12345678",
             'Accept': "application/json",
@@ -112,13 +112,12 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
 
   Future<void> getIdUser() async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
-      var response = await http
-          .get(Uri.parse('$baseUrl/getiduser/${widget.email}'), headers: {
-        'X-API-Key': "12345678",
-        'Accept': "application/json",
-      });
+      var response = await http.get(
+          Uri.parse('http://api.myfin.id:4000/api/getiduser/${widget.email}'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
       print(response.body);
       responseGetIdUser = response.statusCode;
       if (response.statusCode == 200) {

@@ -50,7 +50,9 @@ dependencies:
   intl: ^0.17.0
   local_session_timeout: ^2.2.0
   location: ^4.4.0
+  location_permissions: ^4.0.1
   lottie: ^2.2.0
+  permission_handler: ^10.3.0
   pin_code_fields: ^7.4.0
   shared_preferences: ^2.0.17
   shimmer: ^2.0.0
@@ -60,6 +62,7 @@ dependencies:
       url: https://github.com/filofan1/tflite_flutter_helper.git
       ref: 783f15e5a87126159147d8ea30b98eea9207ac70
   top_snackbar_flutter: ^3.0.0+1
+  trust_location: ^2.0.13
   url_launcher: ^6.1.7
 
 dev_dependencies:

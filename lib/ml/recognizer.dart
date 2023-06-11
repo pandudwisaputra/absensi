@@ -2,10 +2,10 @@
 
 import 'dart:math';
 import 'dart:ui';
+import 'package:absensi/model/recognition.dart';
 import 'package:image/image.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
-import '../model/recognition.dart';
 
 class Recognizer {
   late Interpreter interpreter;
@@ -111,6 +111,7 @@ class Recognizer {
         pair.name = name;
       }
     }
+    print('ini pair: ${pair.name}, ${pair.distance}');
     return pair;
   }
 

@@ -99,20 +99,23 @@ class KaryawanRepository {
     CheckKaryawanModel? profil;
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
       String? email = prefs.getString('email');
       String? idKaryawan = prefs.getString('idKaryawan');
-      var response =
-          await http.get(Uri.parse('$baseUrl/karyawancheck/$email/$idKaryawan'), headers: {
-        'X-API-Key': "12345678",
-        'Accept': "application/json",
-      });
+      var response = await http.get(
+          Uri.parse(
+              'http://api.myfin.id:4000/api/karyawancheck/$email/$idKaryawan'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
       print(response.body);
       if (response.statusCode == 200) {
-        CheckKaryawanModel decode = CheckKaryawanModel.fromJson(jsonDecode(response.body));
+        CheckKaryawanModel decode =
+            CheckKaryawanModel.fromJson(jsonDecode(response.body));
         profil = decode;
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', decode.data.email);
+        await prefs.setString('namaLengkap', decode.data.namaLengkap);
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);

@@ -40,7 +40,7 @@ class _VerifikasiState extends State<Verifikasi> {
   Future<void> registerPegawai(
       {required String email, required String password}) async {
     SharedPreferences server = await SharedPreferences.getInstance();
-    String? baseUrl = server.getString('server');
+
     String? idKaryawan = server.getString('idKaryawan');
     print(idKaryawan);
     try {
@@ -51,12 +51,13 @@ class _VerifikasiState extends State<Verifikasi> {
           "password": password,
         },
       );
-      var response = await http.post(Uri.parse('$baseUrl/register'),
-          headers: {
-            "X-API-Key": "12345678",
-            'Accept': "application/json",
-          },
-          body: msg);
+      var response =
+          await http.post(Uri.parse('http://api.myfin.id:4000/api/register'),
+              headers: {
+                "X-API-Key": "12345678",
+                'Accept': "application/json",
+              },
+              body: msg);
       print(response.body);
       var decode = AktivasiModel.fromJson(jsonDecode(response.body));
       setState(() => responseRegister = decode.code);
@@ -84,8 +85,7 @@ class _VerifikasiState extends State<Verifikasi> {
 
   Future<void> sendOtp() async {
     try {
-      SharedPreferences server = await SharedPreferences.getInstance();
-      String? baseUrl = server.getString('server');
+
       SharedPreferences email = await SharedPreferences.getInstance();
       String? emailRegister = email.getString('emailRegister');
       final msg = jsonEncode(
@@ -93,12 +93,13 @@ class _VerifikasiState extends State<Verifikasi> {
           "email": emailRegister,
         },
       );
-      var response = await http.post(Uri.parse('$baseUrl/sendotp'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          },
-          body: msg);
+      var response =
+          await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
+              headers: {
+                'X-API-Key': "12345678",
+                'Accept': "application/json",
+              },
+              body: msg);
       print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -119,8 +120,7 @@ class _VerifikasiState extends State<Verifikasi> {
     required String email,
     required String otp,
   }) async {
-    SharedPreferences server = await SharedPreferences.getInstance();
-    String? baseUrl = server.getString('server');
+
     try {
       final msg = jsonEncode(
         {
@@ -128,7 +128,8 @@ class _VerifikasiState extends State<Verifikasi> {
           "otp": otp,
         },
       );
-      var response = await http.post(Uri.parse('$baseUrl/otpvalidation'),
+      var response = await http.post(
+          Uri.parse('http://api.myfin.id:4000/api/otpvalidation'),
           headers: {
             "X-API-Key": "12345678",
             'Accept': "application/json",

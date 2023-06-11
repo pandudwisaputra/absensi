@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:absensi/pages/home/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -33,7 +34,6 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
   Future<void> updatePassword({required String newPassword}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
       String? email = prefs.getString('email');
       int? id = prefs.getInt('idPegawai');
       final msg = jsonEncode({
@@ -41,7 +41,8 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
         "email": email,
         "new_password": newPassword,
       });
-      var response = await http.put(Uri.parse('$baseUrl/updatepassword'),
+      var response = await http.put(
+          Uri.parse('http://api.myfin.id:4000/api/updatepassword'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -73,79 +74,85 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: Colors.black,
-              size: 20,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: const Text(
-            'Ubah Kata Sandi',
-            style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 17,
-                fontWeight: FontWeight.w700,
-                color: Colors.black),
-          ),
-          centerTitle: true,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.white,
         ),
-        body: Padding(
-          padding: const EdgeInsets.only(top: 20, left: 27, right: 27),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                AbsensiTextfield(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Harus Diisi';
-                    } else if (value.length < 8) {
-                      return 'Password Minimal 8 Karakter';
-                    }
-                    return null;
-                  },
-                  controller: passController,
-                  hintText: 'Masukkan Password Baru',
-                  obscureText: true,
-                  obscuringCharacter: '*',
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                AbsensiTextfield(
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Harus Diisi';
-                    } else if (value.length < 8) {
-                      return 'Password Minimal 8 Karakter';
-                    }
-                    return null;
-                  },
-                  controller: konfirmasiController,
-                  hintText: 'Masukkan Ulang Password Baru',
-                  obscureText: true,
-                  obscuringCharacter: '*',
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                AbsensiButton(
-                  onPressed: () {
-                    onPressUbahKataSandi(context);
-                  },
-                  text: setUpButtonChild(),
-                  textColor: Colors.white,
-                  color: const Color(0xFF4285F4),
-                ),
-              ],
+        child: Scaffold(
+          appBar: AppBar(
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.black,
+                size: 20,
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            title: const Text(
+              'Ubah Kata Sandi',
+              style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black),
+            ),
+            centerTitle: true,
+          ),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 20, left: 27, right: 27),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  AbsensiTextfield(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Harus Diisi';
+                      } else if (value.length < 8) {
+                        return 'Password Minimal 8 Karakter';
+                      }
+                      return null;
+                    },
+                    controller: passController,
+                    hintText: 'Masukkan Password Baru',
+                    obscureText: true,
+                    obscuringCharacter: '*',
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  AbsensiTextfield(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Harus Diisi';
+                      } else if (value.length < 8) {
+                        return 'Password Minimal 8 Karakter';
+                      }
+                      return null;
+                    },
+                    controller: konfirmasiController,
+                    hintText: 'Masukkan Ulang Password Baru',
+                    obscureText: true,
+                    obscuringCharacter: '*',
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  AbsensiButton(
+                    onPressed: () {
+                      onPressUbahKataSandi(context);
+                    },
+                    text: setUpButtonChild(),
+                    textColor: Colors.white,
+                    color: const Color(0xFF4285F4),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

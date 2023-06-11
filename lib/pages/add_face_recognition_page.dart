@@ -1,5 +1,12 @@
-// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print
+// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print, use_build_context_synchronously
+import 'dart:convert';
 
+import 'package:absensi/helper/exception_handler.dart';
+import 'package:absensi/model/face_detector_painter.dart';
+import 'package:absensi/pages/connection.dart';
+import 'package:absensi/pages/home/navbar.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:absensi/model/recognition.dart';
 import 'package:absensi/ml/recognizer.dart';
 import 'package:absensi/widget/absensi_button.dart';
@@ -8,6 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 Future<List<CameraDescription>> getAvailableCameras() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,6 +34,7 @@ class AddFaceRecognitionPage extends StatefulWidget {
 }
 
 class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
+  int? responseRegister;
   dynamic controller;
   bool isBusy = false;
   late Size size;
@@ -32,11 +43,9 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
   CameraLensDirection camDirec = CameraLensDirection.front;
   late List<Recognition> recognitions = [];
 
-  // declare face detector
   // Mendeteksi wajah
   late FaceDetector faceDetector;
 
-  // declare face recognizer
   // Mengenali wajah
   late Recognizer _recognizer;
 
@@ -44,21 +53,17 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
   void initState() {
     super.initState();
 
-    // initialize face detector
     // Inisialisasi detektor wajah
     faceDetector = FaceDetector(
         options: FaceDetectorOptions(performanceMode: FaceDetectorMode.fast));
 
-    // initialize face recognizer
     // Inisialisasi pengenali wajah
     _recognizer = Recognizer();
 
-    // initialize camera footage
     // Inisialisasi rekaman kamera
     initializeCamera();
   }
 
-  // code to initialize the camera's feed
   // kode untuk menginisialisasi feed kamera
   initializeCamera() async {
     controller = CameraController(description, ResolutionPreset.high);
@@ -68,12 +73,15 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
       }
       controller.startImageStream((image) => {
             if (!isBusy)
-              {isBusy = true, frame = image, doFaceDetectionOnFrame()}
+              {
+                isBusy = true,
+                frame = image,
+                doFaceDetectionOnFrame(),
+              }
           });
     });
   }
 
-  // close all resources
   // Tutup semua sumber daya
   @override
   void dispose() {
@@ -81,20 +89,16 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
     super.dispose();
   }
 
-  // face detection on a frame
   // Deteksi wajah pada sebuah frame
   dynamic _scanResults;
   CameraImage? frame;
 
   doFaceDetectionOnFrame() async {
-    // convert frame into InputImage format
     // Mengkonversi frame ke dalam format InputImage
     InputImage inputImage = getInputImage();
-    // pass InputImage to face detection model and detect faces
     // Mengirim InputImage ke model deteksi wajah dan mendeteksi wajah-wajah
     List<Face> faces = await faceDetector.processImage(inputImage);
     print("NUMBER OF FACES =*==*==*==*==*==*=>${faces.length}");
-    // perform face recognition on detected faces
     // Melakukan pengenalan wajah pada wajah-wajah yang terdeteksi
     performFaceRecognition(faces);
     if (mounted) {
@@ -108,12 +112,10 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
   img.Image? image;
   bool register = false;
 
-  // perform Face Recognition
   // Melakukan Pengenalan Wajah
   performFaceRecognition(List<Face> faces) async {
     recognitions.clear();
 
-    // convert CameraImage to Image and rotate it so that our frame will be in a portrait
     // Untuk mengonversi CameraImage menjadi Image dan memutarnya sehingga frame kita dalam mode potret
     image = _convertYUV420(frame!);
     image = img.copyRotate(
@@ -121,7 +123,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
 
     for (Face face in faces) {
       Rect faceRect = face.boundingBox;
-      // crop face
       // memotong wajah dari frame
       img.Image croppedFace = img.copyCrop(
           image!,
@@ -130,7 +131,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
           faceRect.width.toInt(),
           faceRect.height.toInt());
 
-      // pass cropped face to face recognition model
       // Meneruskan wajah yang telah dipotong ke model pengenalan wajah.
       Recognition recognition = _recognizer.recognize(croppedFace, faceRect);
       if (recognition.distance > 1) {
@@ -138,7 +138,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
       }
       recognitions.add(recognition);
 
-      // show face registration dialogue
       // menampilkan dialog registrasi wajah
       if (register) {
         showFaceRegistrationDialogue(croppedFace, recognition);
@@ -153,108 +152,76 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
     }
   }
 
-  // Face Registration Dialogue
-  // menampilkan dialog registrasi wajah 
-  TextEditingController textEditingController = TextEditingController();
-
+  // menampilkan dialog registrasi wajah
   showFaceRegistrationDialogue(img.Image croppedFace, Recognition recognition) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("Face Registration", textAlign: TextAlign.center),
-        alignment: Alignment.center,
-        content: SizedBox(
-          height: 340,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(
-                height: 20,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(25),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15),
+                color: Colors.white,
               ),
-              Image.memory(
-                Uint8List.fromList(img.encodeBmp(croppedFace)),
-                width: 200,
-                height: 200,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Registrasi Wajah',
+                    style: TextStyle(
+                      fontFamily: 'Open Sans',
+                      fontSize: 17,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Image.memory(
+                    Uint8List.fromList(img.encodeBmp(croppedFace)),
+                    width: 200,
+                    height: 200,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                      onPressed: () {
+                        // Recognizer.registered.putIfAbsent(
+                        //     textEditingController.text, () => recognition);
+                        onPress(context: context, recognition: recognition);
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          minimumSize: const Size(200, 40)),
+                      child: const Text("Konfirmasi"))
+                ],
               ),
-              SizedBox(
-                width: 200,
-                child: TextField(
-                    controller: textEditingController,
-                    decoration: const InputDecoration(
-                        fillColor: Colors.white,
-                        filled: true,
-                        hintText: "Enter Name")),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              ElevatedButton(
-                  onPressed: () {
-                    Recognizer.registered.putIfAbsent(
-                        textEditingController.text, () => recognition);
-                    textEditingController.text = "";
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Face Registered"),
-                    ));
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      minimumSize: const Size(200, 40)),
-                  child: const Text("Register"))
-            ],
-          ),
+            ),
+          ],
         ),
-        contentPadding: EdgeInsets.zero,
       ),
     );
   }
 
-  // method to convert CameraImage to Image
-  // mengonversi CameraImage menjadi format Image
-  img.Image convertYUV420ToImage(CameraImage cameraImage) {
-    final width = cameraImage.width;
-    final height = cameraImage.height;
-
-    final yRowStride = cameraImage.planes[0].bytesPerRow;
-    final uvRowStride = cameraImage.planes[1].bytesPerRow;
-    final uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
-
-    final image = img.Image(width, height);
-
-    for (var w = 0; w < width; w++) {
-      for (var h = 0; h < height; h++) {
-        final uvIndex =
-            uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
-        final index = h * width + w;
-        final yIndex = h * yRowStride + w;
-
-        final y = cameraImage.planes[0].bytes[yIndex];
-        final u = cameraImage.planes[1].bytes[uvIndex];
-        final v = cameraImage.planes[2].bytes[uvIndex];
-
-        image.data[index] = yuv2rgb(y, u, v);
-      }
-    }
-    return image;
-  }
-
   img.Image _convertYUV420(CameraImage image) {
-    var imag = img.Image(image.width, image.height); // Create Image buffer Membuat | buffer gambar
+    var imag = img.Image(image.width, image.height); // Membuat buffer gambar
 
     Plane plane = image.planes[0];
     const int shift = (0xFF << 24);
 
-    // Fill image buffer with plane[0] from YUV420_888
     // mengisi buffer gambar dengan plane[0] dari format YUV420_888
     for (int x = 0; x < image.width; x++) {
       for (int planeOffset = 0;
           planeOffset < image.height * image.width;
           planeOffset += image.width) {
         final pixelColor = plane.bytes[planeOffset + x];
-        // color: 0x FF  FF  FF  FF
-        //           A   B   G   R
-        // Calculate pixel color
         // menghitung warna piksel
         var newVal =
             shift | (pixelColor << 16) | (pixelColor << 8) | pixelColor;
@@ -266,26 +233,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
     return imag;
   }
 
-  int yuv2rgb(int y, int u, int v) {
-    // Convert yuv pixel to rgb
-    // mengonversi piksel YUV menjadi RGB
-    var r = (y + v * 1436 / 1024 - 179).round();
-    var g = (y - u * 46549 / 131072 + 44 - v * 93604 / 131072 + 91).round();
-    var b = (y + u * 1814 / 1024 - 227).round();
-
-    // Clipping RGB values to be inside boundaries [ 0 , 255 ]
-    // membatasi nilai-nilai RGB agar berada di dalam rentang [0, 255]
-    r = r.clamp(0, 255);
-    g = g.clamp(0, 255);
-    b = b.clamp(0, 255);
-
-    return 0xff000000 |
-        ((b << 16) & 0xff0000) |
-        ((g << 8) & 0xff00) |
-        (r & 0xff);
-  }
-
-  //  convert CameraImage to InputImage
   // mengonversi CameraImage menjadi InputImage
   InputImage getInputImage() {
     final WriteBuffer allBytes = WriteBuffer();
@@ -298,11 +245,9 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
     final camera = description;
     final imageRotation =
         InputImageRotationValue.fromRawValue(camera.sensorOrientation);
-    // if (imageRotation == null) return;
 
     final inputImageFormat =
         InputImageFormatValue.fromRawValue(frame!.format.raw);
-    // if (inputImageFormat == null) return null;
 
     final planeData = frame!.planes.map(
       (Plane plane) {
@@ -327,7 +272,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
     return inputImage;
   }
 
-  //  Show rectangles around detected faces
   // menampilkan persegi panjang (rectangle) di sekitar wajah-wajah yang terdeteksi
   Widget buildResult() {
     if (_scanResults == null ||
@@ -346,12 +290,58 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
     );
   }
 
+  Future<void> registerRecognition({
+    required String name,
+    required Rect location,
+    required List<double> embeddings,
+    required double distance,
+  }) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? key = prefs.getString('namaLengkap');
+    int? idPegawai = prefs.getInt('idPegawai');
+    try {
+      var response = await http.post(
+        Uri.parse('http://api.myfin.id:4000/api/recognition'),
+        headers: {
+          'X-API-Key': '12345678',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({
+          'id_user': idPegawai,
+          'key': key,
+          'name': name,
+          'location_left': location.left.toString(),
+          'location_top': location.top.toString(),
+          'location_right': location.right.toString(),
+          'location_bottom': location.bottom.toString(),
+          'embeddings': embeddings.toString(),
+          'distance': distance.toString(),
+        }),
+      );
+      print(response.body);
+      setState(() {
+        responseRegister = response.statusCode;
+      });
+    } catch (e) {
+      var error = ExceptionHandlers().getExceptionString(e);
+      await Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => ConnectionPage(
+            button: true,
+            error: error,
+          ),
+        ),
+        (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> stackChildren = [];
     size = MediaQuery.of(context).size;
     if (controller != null) {
-      // View for displaying the live camera footage
       // menampilkan rekaman kamera secara live
       stackChildren.add(
         Positioned(
@@ -370,7 +360,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
         ),
       );
 
-      //  View for displaying rectangles around detected aces
       // menampilkan persegi panjang (rectangle) di sekitar wajah yang terdeteksi
       stackChildren.add(
         Positioned(
@@ -382,7 +371,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
       );
     }
 
-    // View for displaying the bar to switch camera direction or for registering faces
     // menampilkan bar untuk mengganti arah kamera atau untuk mendaftarkan wajah
     stackChildren.add(
       Positioned(
@@ -394,7 +382,7 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
           padding: const EdgeInsets.symmetric(horizontal: 30),
           child: AbsensiButton(
             onPressed: () => register = true,
-            text: const Text('Submit'),
+            text: const Text('Ambil Foto'),
             color: Colors.white,
             textColor: const Color(0xFF4285F4),
           ),
@@ -414,55 +402,36 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
       ),
     );
   }
-}
 
-class FaceDetectorPainter extends CustomPainter {
-  FaceDetectorPainter(this.absoluteImageSize, this.faces, this.camDire2);
-
-  final Size absoluteImageSize;
-  final List<Recognition> faces;
-  CameraLensDirection camDire2;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double scaleX = size.width / absoluteImageSize.width;
-    final double scaleY = size.height / absoluteImageSize.height;
-
-    final Paint paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..color = Colors.indigoAccent;
-
-    for (Recognition face in faces) {
-      canvas.drawRect(
-        Rect.fromLTRB(
-          camDire2 == CameraLensDirection.front
-              ? (absoluteImageSize.width - face.location.right) * scaleX
-              : face.location.left * scaleX,
-          face.location.top * scaleY,
-          camDire2 == CameraLensDirection.front
-              ? (absoluteImageSize.width - face.location.left) * scaleX
-              : face.location.right * scaleX,
-          face.location.bottom * scaleY,
+  void onPress({
+    required BuildContext context,
+    required Recognition recognition,
+  }) async {
+    await registerRecognition(
+      name: recognition.name,
+      location: recognition.location,
+      embeddings: recognition.embeddings,
+      distance: recognition.distance,
+    );
+    if (responseRegister == 200) {
+      showTopSnackBar(
+        Overlay.of(context),
+        const CustomSnackBar.success(
+          message: 'Berhasil Menambahkan Data',
         ),
-        paint,
       );
-
-      TextSpan span = TextSpan(
-          style: const TextStyle(color: Colors.white, fontSize: 20),
-          text: "${face.name}  ${face.distance.toStringAsFixed(2)}");
-      TextPainter tp = TextPainter(
-          text: span,
-          textAlign: TextAlign.left,
-          textDirection: TextDirection.ltr);
-      tp.layout();
-      tp.paint(canvas,
-          Offset(face.location.left * scaleX, face.location.top * scaleY));
+      await Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(builder: (context) => const Navbar()),
+        (route) => false,
+      );
+    } else {
+      showTopSnackBar(
+        Overlay.of(context),
+        const CustomSnackBar.error(
+          message: 'Gagal Menambahkan Data',
+        ),
+      );
     }
-  }
-
-  @override
-  bool shouldRepaint(FaceDetectorPainter oldDelegate) {
-    return true;
   }
 }

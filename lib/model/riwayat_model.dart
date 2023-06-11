@@ -58,22 +58,19 @@ class RiwayatModel {
 class RiwayatRepository {
   static Future getData(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? baseurl = prefs.getString('server');
     int? id = prefs.getInt('idPegawai');
     try {
-      var response =
-          await http.get(Uri.parse('$baseurl/riwayatpresensi/$id'), headers: {
-        'X-API-Key': "12345678",
-        'Accept': "application/json",
-      });
+      var response = await http.get(
+          Uri.parse('http://api.myfin.id:4000/api/riwayatpresensi/$id'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
       print(response.body);
       if (response.statusCode == 200) {
         Iterable it = jsonDecode(response.body)["data"];
         List<RiwayatModel> listRiwayat =
             it.map((e) => RiwayatModel.fromJson(e)).toList();
-        return listRiwayat;
-      } else {
-        List<RiwayatModel> listRiwayat = [];
         return listRiwayat;
       }
     } catch (e) {
@@ -91,4 +88,3 @@ class RiwayatRepository {
     }
   }
 }
-

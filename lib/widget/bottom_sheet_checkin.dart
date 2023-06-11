@@ -1,7 +1,10 @@
 // ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
+import 'package:absensi/model/check_recognition_model.dart';
 import 'package:absensi/model/presensi_model.dart';
+import 'package:absensi/pages/data_pegawai_page.dart';
+import 'package:absensi/pages/face_recognition_page.dart';
 import 'package:absensi/pages/home/navbar.dart';
 import 'package:absensi/widget/loading_presensi.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,11 +33,12 @@ class BottomSheetCheckIn extends StatefulWidget {
 class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
   int? radiusUser;
   int? responsePresensiMasuk;
+  CheckRecognitionModel? dataRecognition;
+  int? responseRecognitionCheck;
 
   Future<void> presensiMasuk({required BuildContext context}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
       String? userLatitude = prefs.getString('userLatitude');
       String? userLongitude = prefs.getString('userLongitude');
       String? userLocation = prefs.getString('userLocation');
@@ -48,7 +52,8 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
         "longitude": userLongitude,
         "alamat": userLocation
       });
-      var response = await http.post(Uri.parse('$baseUrl/presensimasuk'),
+      var response = await http.post(
+          Uri.parse('http://api.myfin.id:4000/api/presensimasuk'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -61,6 +66,38 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
             PresensiModel.fromJson(jsonDecode(response.body));
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setInt('idPresensi', presensi.data.idPresensi);
+      }
+    } catch (e) {
+      var error = ExceptionHandlers().getExceptionString(e);
+      await Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => ConnectionPage(
+            button: true,
+            error: error,
+          ),
+        ),
+        (route) => false,
+      );
+    }
+  }
+
+  Future<void> recognitionCheck() async {
+    try {
+      SharedPreferences server = await SharedPreferences.getInstance();
+
+      int? idPegawai = server.getInt('idPegawai');
+      var response = await http.get(
+          Uri.parse('http://api.myfin.id:4000/api/recognition/$idPegawai'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
+      print(response.body);
+      responseRecognitionCheck = response.statusCode;
+      if (response.statusCode == 200) {
+        dataRecognition =
+            CheckRecognitionModel.fromJson(jsonDecode(response.body));
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -320,26 +357,111 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
     int? radius = prefs.getInt('radius');
     if (radius != null) {
       if (radiusUser <= radius) {
-        pleaseWait(context);
-        await presensiMasuk(context: context);
-        if (responsePresensiMasuk == 200) {
-          Navigator.pop(context, true);
-          showTopSnackBar(
-            Overlay.of(context),
-            const CustomSnackBar.success(
-              message: 'Berhasil Checkin',
-            ),
-          );
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: ((context) => const Navbar())),
-            (route) => false,
-          );
+        await recognitionCheck();
+        if (responseRecognitionCheck == 200) {
+          final result = await Navigator.push(
+              context,
+              CupertinoPageRoute(
+                  builder: ((context) => FaceRecognitionPage(
+                        result: dataRecognition!,
+                      ))));
+          if (result == true) {
+            pleaseWait(context);
+            await presensiMasuk(context: context);
+            if (responsePresensiMasuk == 200) {
+              Navigator.pop(context, true);
+              showTopSnackBar(
+                Overlay.of(context),
+                const CustomSnackBar.success(
+                  message: 'Berhasil Checkin',
+                ),
+              );
+              Navigator.pushAndRemoveUntil(
+                context,
+                CupertinoPageRoute(builder: ((context) => const Navbar())),
+                (route) => false,
+              );
+            } else {
+              showTopSnackBar(
+                Overlay.of(context),
+                const CustomSnackBar.error(
+                  message: 'Terjadi Kesalahan',
+                ),
+              );
+            }
+          }
         } else {
           showTopSnackBar(
             Overlay.of(context),
             const CustomSnackBar.error(
-              message: 'Terjadi Kesalahan',
+              message: 'Kamu Belum Melakukan Registrasti Wajah',
+            ),
+          );
+          Navigator.pop(context);
+          showDialog(
+            barrierDismissible: true,
+            context: context,
+            builder: (context) => Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              insetPadding: const EdgeInsets.all(10),
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 40),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Info penting!',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        const Text(
+                          'Untuk menggunakan proses check in dan check out kamu harus melakukan registrasi wajah terlebih dulu',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        AbsensiButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          color: const Color(0xFF4285F4),
+                          textColor: Colors.white,
+                          paddingVertical: 10,
+                          text: const Text(
+                            'Tutup',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }

@@ -1,14 +1,22 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:absensi/model/office_model.dart';
 import 'package:absensi/model/profile_model.dart';
+import 'package:absensi/pages/login_page.dart';
+import 'package:absensi/widget/absensi_button.dart';
 import 'package:absensi/widget/absensi_button_dashboard.dart';
 import 'package:absensi/widget/absensi_jam_realtime.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
 import 'package:absensi/apiLoc/location_service.dart';
-import 'package:absensi/apiLoc/user_location.dart';
 import 'package:absensi/widget/absensi_jam.dart';
+import 'package:absensi/widget/click_image.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -18,8 +26,15 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  LocationService locationService = LocationService();
   GoogleMapController? mapController;
+  LocationUpdater locationUpdater = LocationUpdater();
+
+  /// initialize state.
+  @override
+  void initState() {
+    super.initState();
+    locationUpdater.startLocationUpdates();
+  }
 
   String greetingMessage() {
     var timeNow = DateTime.now().hour;
@@ -97,12 +112,21 @@ class _DashboardPageState extends State<DashboardPage> {
                               ),
                             ],
                           ),
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundImage: NetworkImage(
-                              profile.data.avatar == '-'
-                                  ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimageprofile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                  : profile.data.avatar,
+                          GestureDetector(
+                            onTap: () {
+                              clickImage(
+                                  context,
+                                  profile.data.avatar == '-'
+                                      ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
+                                      : profile.data.avatar);
+                            },
+                            child: CircleAvatar(
+                              radius: 24,
+                              backgroundImage: NetworkImage(
+                                profile.data.avatar == '-'
+                                    ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
+                                    : profile.data.avatar,
+                              ),
                             ),
                           ),
                         ],
@@ -164,74 +188,164 @@ class _DashboardPageState extends State<DashboardPage> {
                     );
                   } else if (snapshot.hasData) {
                     OfficeModel office = snapshot.data!;
+                    bool isFirstData = true;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        StreamBuilder<Userlocation>(
-                            stream: locationService.locationStrem,
-                            builder: (context, snapshort) {
-                              if (snapshort.hasData) {
-                                return Column(
-                                  children: [
-                                    Container(
-                                      height: 250,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
+                        StreamBuilder(
+                          stream: locationUpdater.locationStream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              double latitude = locationUpdater.latitude;
+                              double longitude = locationUpdater.longitude;
+                              bool isMockLocation = snapshot.data!;
+                              if (kDebugMode) {
+                                print('ini isMockLocation : $isMockLocation');
+                                print('ini isFirstData : $isFirstData');
+                              }
+                              if (isMockLocation == true &&
+                                  isFirstData == false) {
+                                Future.microtask(() async {
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  await prefs.setBool('isLoggedIn', false);
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      CupertinoPageRoute(
+                                        builder: (context) => const LoginPage(),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(20),
-                                          topRight: Radius.circular(20),
-                                          bottomRight: Radius.circular(20),
-                                          bottomLeft: Radius.circular(20),
-                                        ),
-                                        child: GoogleMap(
-                                          myLocationEnabled: true,
-                                          onMapCreated: (controller) =>
-                                              mapController = controller,
-                                          initialCameraPosition: CameraPosition(
-                                            target: LatLng(
-                                                snapshort.data!.latitude,
-                                                snapshort.data!.longtitude),
-                                            zoom: 17,
-                                          ),
-                                          markers: {
-                                            Marker(
-                                              markerId:
-                                                  const MarkerId("source"),
-                                              position: LatLng(
-                                                  double.parse(
-                                                      office.data.latitude),
-                                                  double.parse(
-                                                      office.data.longitude)),
+                                      (route) => false,
+                                    );
+                                    showDialog(
+                                      barrierDismissible: true,
+                                      context: context,
+                                      builder: (context) => Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        elevation: 0,
+                                        insetPadding: const EdgeInsets.all(10),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: <Widget>[
+                                            Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 40),
+                                              padding: const EdgeInsets.all(20),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white,
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Text(
+                                                    'Info penting!',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  const Text(
+                                                    'Ada yang ketahuan tidak jujur nih. Kamu tidak akan bisa melakukan presensi jika masih menggunakan lokasi palsu :p',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  AbsensiButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      exit(0);
+                                                    },
+                                                    color:
+                                                        const Color(0xFF4285F4),
+                                                    textColor: Colors.white,
+                                                    paddingVertical: 10,
+                                                    text: const Text(
+                                                      'Tutup',
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                          },
-                                          circles: {
-                                            Circle(
-                                                circleId: const CircleId('ID'),
-                                                center: LatLng(
-                                                    snapshort.data!.latitude,
-                                                    snapshort.data!.longtitude),
-                                                radius: 5,
-                                                fillColor: Colors.blueAccent
-                                                    .withOpacity(0.5),
-                                                strokeWidth: 3,
-                                                strokeColor: Colors.blueAccent)
-                                          },
+                                          ],
                                         ),
+                                      ),
+                                    );
+                                  });
+                                });
+                              }
+                              isFirstData = false;
+
+                              return Column(
+                                children: [
+                                  Container(
+                                    height: 250,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20),
+                                        bottomRight: Radius.circular(20),
+                                        bottomLeft: Radius.circular(20),
+                                      ),
+                                      child: GoogleMap(
+                                        myLocationEnabled: true,
+                                        onMapCreated: (controller) =>
+                                            mapController = controller,
+                                        initialCameraPosition: CameraPosition(
+                                          target: LatLng(latitude, longitude),
+                                          zoom: 17,
+                                        ),
+                                        markers: {
+                                          Marker(
+                                            markerId: const MarkerId("source"),
+                                            position: LatLng(
+                                                double.parse(
+                                                    office.data.latitude),
+                                                double.parse(
+                                                    office.data.longitude)),
+                                          ),
+                                        },
                                       ),
                                     ),
-                                  ],
-                                );
-                              } else if (snapshort.connectionState ==
-                                  ConnectionState.waiting) {
-                                return shimmer(
-                                    height: 250,
-                                    width: MediaQuery.of(context).size.width);
-                              } else {
-                                return const SizedBox();
-                              }
-                            }),
+                                  ),
+                                ],
+                              );
+                            }
+
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return shimmer(
+                                  height: 250,
+                                  width: MediaQuery.of(context).size.width);
+                            } else {
+                              return const SizedBox();
+                            }
+                          },
+                        ),
                         const SizedBox(
                           height: 20,
                         ),

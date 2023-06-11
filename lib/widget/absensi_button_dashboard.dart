@@ -23,7 +23,6 @@ class _ButtondashboardState extends State<Buttondashboard> {
     Future<void> showSuccessDialog() async {
       SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          systemNavigationBarColor: Colors.black54,
           statusBarIconBrightness: Brightness.light));
       return showDialog(
         context: context,

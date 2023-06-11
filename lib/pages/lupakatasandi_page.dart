@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:absensi/pages/verif_lupakatasandi_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
@@ -30,14 +29,13 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
 
   Future<void> emailCheck({required String email}) async {
     try {
-      SharedPreferences server = await SharedPreferences.getInstance();
-      String? baseUrl = server.getString('server');
 
-      var response =
-          await http.get(Uri.parse('$baseUrl/emailcheck/$email'), headers: {
-        'X-API-Key': "12345678",
-        'Accept': "application/json",
-      });
+      var response = await http.get(
+          Uri.parse('http://api.myfin.id:4000/api/emailcheck/$email'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
       print(response.body);
       responseEmailCheck = response.statusCode;
     } catch (e) {
@@ -57,19 +55,19 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
 
   Future<void> sendOtp({required String email}) async {
     try {
-      SharedPreferences server = await SharedPreferences.getInstance();
-      String? baseUrl = server.getString('server');
+
       final msg = jsonEncode(
         {
           "email": email,
         },
       );
-      var response = await http.post(Uri.parse('$baseUrl/sendotp'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          },
-          body: msg);
+      var response =
+          await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
+              headers: {
+                'X-API-Key': "12345678",
+                'Accept': "application/json",
+              },
+              body: msg);
       responseSendOtp = response.statusCode;
       print(response.body);
     } catch (e) {

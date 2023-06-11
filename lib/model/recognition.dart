@@ -7,6 +7,11 @@ class Recognition {
   Rect location;
   List<double> embeddings;
   double distance;
-  // Constructs a Category.
+  
   Recognition(this.name, this.location, this.embeddings, this.distance);
+
+  @override
+  String toString() {
+    return 'Recognition: { name: $name, location: $location, embeddings: $embeddings, distance: $distance }';
+  }
 }

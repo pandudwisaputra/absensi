@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:absensi/pages/login_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:http/http.dart' as http;
@@ -34,14 +33,13 @@ class _BuatKataSandiState extends State<BuatKataSandi> {
 
   Future<void> updatePassword({required String newPassword}) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
       final msg = jsonEncode({
         "id_user": widget.id,
         "email": widget.email,
         "new_password": newPassword,
       });
-      var response = await http.put(Uri.parse('$baseUrl/updatepassword'),
+      var response = await http.put(
+          Uri.parse('http://api.myfin.id:4000/api/updatepassword'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

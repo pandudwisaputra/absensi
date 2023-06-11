@@ -10,6 +10,7 @@ import 'package:absensi/widget/absensi_textfield.dart';
 import 'package:absensi/pages/home/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,15 +38,15 @@ class _LoginPageState extends State<LoginPage> {
     Future<void> loginPegawai(
         {required String email, required String password}) async {
       try {
-        SharedPreferences server = await SharedPreferences.getInstance();
-        String? baseUrl = server.getString('server');
+
         final msg = jsonEncode({"email": email, "password": password});
-        var response = await http.post(Uri.parse('$baseUrl/login'),
-            headers: {
-              'X-API-Key': "12345678",
-              'Accept': "application/json",
-            },
-            body: msg);
+        var response =
+            await http.post(Uri.parse('http://api.myfin.id:4000/api/login'),
+                headers: {
+                  'X-API-Key': "12345678",
+                  'Accept': "application/json",
+                },
+                body: msg);
         print(response.body);
         status = response.statusCode;
         if (response.statusCode == 200) {
@@ -262,8 +263,15 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    return Scaffold(
-      body: content(),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.white,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: Colors.white,
+      ),
+      child: Scaffold(
+        body: content(),
+      ),
     );
   }
 }

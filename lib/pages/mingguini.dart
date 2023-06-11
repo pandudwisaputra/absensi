@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
-class Semua extends StatelessWidget {
-  const Semua({super.key});
+class MingguIni extends StatelessWidget {
+  const MingguIni({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,19 +45,36 @@ class Semua extends StatelessWidget {
                 });
           } else if (snapshot.hasData) {
             List<RiwayatModel> listRiwayat = snapshot.data;
-            listRiwayat
+            List<RiwayatModel> resultRiwayat = [];
+            DateTime now = DateTime.now();
+            DateTime startOfWeek =
+                now.subtract(Duration(days: now.weekday - 1));
+            DateTime endOfWeek = now.add(Duration(days: 7 - now.weekday));
+
+            for (RiwayatModel riwayat in listRiwayat) {
+              DateTime tanggalPresensi =
+                  DateTime.fromMillisecondsSinceEpoch(
+                  int.parse(riwayat.tanggalPresensi));
+
+              if (tanggalPresensi.isAfter(startOfWeek) &&
+                  tanggalPresensi.isBefore(endOfWeek)) {
+                resultRiwayat.add(riwayat); 
+              }
+            }
+
+            resultRiwayat
                 .sort((a, b) => b.tanggalPresensi.compareTo(a.tanggalPresensi));
             return ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: listRiwayat.length,
+              itemCount: resultRiwayat.length,
               itemBuilder: (context, index) {
                 DateTime parsedDateTime = DateTime.fromMillisecondsSinceEpoch(
-                    int.parse(listRiwayat[index].tanggalPresensi));
+                    int.parse(resultRiwayat[index].tanggalPresensi));
                 String formatDate =
                     DateFormat("dd MMMM yyyy", "ID").format(parsedDateTime);
 
                 List<String> keteranganMasuk =
-                    listRiwayat[index].keteranganMasuk.split(" ");
+                    resultRiwayat[index].keteranganMasuk.split(" ");
                 String keteranganMasukCapitalize = "";
 
                 for (String kataSekarang in keteranganMasuk) {
@@ -66,7 +83,7 @@ class Semua extends StatelessWidget {
                 }
 
                 List<String> keteranganKeluar =
-                    listRiwayat[index].ketaranganKeluar.split(" ");
+                    resultRiwayat[index].ketaranganKeluar.split(" ");
                 String keteranganKeluarCapitalize = "";
 
                 for (String kataSekarangDua in keteranganKeluar) {
@@ -88,7 +105,7 @@ class Semua extends StatelessWidget {
                       const SizedBox(
                         height: 10,
                       ),
-                      listRiwayat[index].keteranganMasuk != 'Tidak Masuk'
+                      resultRiwayat[index].keteranganMasuk != 'Tidak Masuk'
                           ? Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               padding: const EdgeInsets.only(
@@ -129,7 +146,7 @@ class Semua extends StatelessWidget {
                                                                 0xFF00AC47))),
                                             TextSpan(
                                                 text:
-                                                    ' ${listRiwayat[index].jamMasuk} WIB',
+                                                    ' ${resultRiwayat[index].jamMasuk} WIB',
                                                 style: TextStyle(
                                                     fontFamily: 'Inter',
                                                     fontWeight: FontWeight.w700,
@@ -176,7 +193,7 @@ class Semua extends StatelessWidget {
                                                 ),
                                               ),
                                               Text(
-                                                listRiwayat[index].alamat,
+                                                resultRiwayat[index].alamat,
                                                 style: const TextStyle(
                                                   fontFamily: 'Inter',
                                                   fontSize: 9,
@@ -204,7 +221,7 @@ class Semua extends StatelessWidget {
                               ),
                               child: Center(
                                   child: Text(
-                                listRiwayat[index].keteranganMasuk,
+                                resultRiwayat[index].keteranganMasuk,
                                 style: const TextStyle(
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.w700,
@@ -212,7 +229,7 @@ class Semua extends StatelessWidget {
                                 ),
                               )),
                             ),
-                      listRiwayat[index].keteranganMasuk != 'Tidak Masuk'
+                      resultRiwayat[index].keteranganMasuk != 'Tidak Masuk'
                           ? Container(
                               margin: const EdgeInsets.only(bottom: 12),
                               padding: const EdgeInsets.only(
@@ -238,44 +255,42 @@ class Semua extends StatelessWidget {
                                       ),
                                       RichText(
                                         text: TextSpan(
-                                            children: listRiwayat[index]
-                                                        .status ==
-                                                    'Selesai'
-                                                ? <TextSpan>[
-                                                    TextSpan(
-                                                        text:
-                                                            keteranganKeluarCapitalize,
-                                                        style: const TextStyle(
-                                                            fontFamily: 'Inter',
-                                                            fontSize: 10,
-                                                            color: Color(
-                                                                0xFFEA4435))),
-                                                    listRiwayat[index]
-                                                                .jamPulang !=
-                                                            '-'
-                                                        ? TextSpan(
-                                                            text:
-                                                                ' ${listRiwayat[index].jamPulang} WIB',
-                                                            style: const TextStyle(
-                                                                fontFamily:
-                                                                    'Inter',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w700,
-                                                                fontSize: 10,
-                                                                color: Color(
-                                                                    0xFFEA4435)))
-                                                        : const TextSpan()
-                                                  ]
-                                                : <TextSpan>[
-                                                    const TextSpan(
-                                                        text: 'BELUM KELUAR',
-                                                        style: TextStyle(
-                                                            fontFamily: 'Inter',
-                                                            fontSize: 10,
-                                                            color: Color(
-                                                                0xFFEA4435))),
-                                                  ]),
+                                          children:
+                                              keteranganKeluarCapitalize == '- '
+                                                  ? <TextSpan>[
+                                                      const TextSpan(
+                                                          text: 'BELUM KELUAR',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Inter',
+                                                              fontSize: 10,
+                                                              color: Color(
+                                                                  0xFFEA4435))),
+                                                    ]
+                                                  : <TextSpan>[
+                                                      TextSpan(
+                                                          text:
+                                                              keteranganKeluarCapitalize,
+                                                          style: const TextStyle(
+                                                              fontFamily:
+                                                                  'Inter',
+                                                              fontSize: 10,
+                                                              color: Color(
+                                                                  0xFFEA4435))),
+                                                      TextSpan(
+                                                          text:
+                                                              ' ${resultRiwayat[index].jamPulang} WIB',
+                                                          style: const TextStyle(
+                                                              fontFamily:
+                                                                  'Inter',
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              fontSize: 10,
+                                                              color: Color(
+                                                                  0xFFEA4435))),
+                                                    ],
+                                        ),
                                       )
                                     ],
                                   ),
@@ -309,7 +324,7 @@ class Semua extends StatelessWidget {
                                                 ),
                                               ),
                                               Text(
-                                                listRiwayat[index].alamat,
+                                                resultRiwayat[index].alamat,
                                                 style: const TextStyle(
                                                   fontFamily: 'Inter',
                                                   fontSize: 9,

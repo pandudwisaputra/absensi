@@ -1,6 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
 
 import 'dart:convert';
+import 'package:absensi/model/check_recognition_model.dart';
+import 'package:absensi/pages/face_recognition_page.dart';
 import 'package:absensi/pages/home/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -29,11 +31,12 @@ class BottomSheetCheckOut extends StatefulWidget {
 class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
   int? radiusUser;
   int? responsePresensiKeluar;
+  CheckRecognitionModel? dataRecognition;
+  int? responseRecognitionCheck;
 
   Future<void> presensiKeluar({required BuildContext context}) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
       int? id = prefs.getInt('idPegawai');
       int? idPresensi = prefs.getInt('idPresensi');
       String? tanggalPresensi = prefs.getString('tanggalPresensi');
@@ -43,7 +46,8 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
         "tanggal_presensi": tanggalPresensi,
       });
       print(DateTime.now().millisecondsSinceEpoch.toString());
-      var response = await http.put(Uri.parse('$baseUrl/presensikeluar'),
+      var response = await http.put(
+          Uri.parse('http://api.myfin.id:4000/api/presensikeluar'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -51,6 +55,38 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
           body: msg);
       print(response.body);
       responsePresensiKeluar = response.statusCode;
+    } catch (e) {
+      var error = ExceptionHandlers().getExceptionString(e);
+      await Navigator.pushAndRemoveUntil(
+        context,
+        CupertinoPageRoute(
+          builder: (context) => ConnectionPage(
+            button: true,
+            error: error,
+          ),
+        ),
+        (route) => false,
+      );
+    }
+  }
+
+  Future<void> recognitionCheck() async {
+    try {
+      SharedPreferences server = await SharedPreferences.getInstance();
+
+      int? idPegawai = server.getInt('idPegawai');
+      var response = await http.get(
+          Uri.parse('http://api.myfin.id:4000/api/recognition/$idPegawai'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
+      print(response.body);
+      responseRecognitionCheck = response.statusCode;
+      if (response.statusCode == 200) {
+        dataRecognition =
+            CheckRecognitionModel.fromJson(jsonDecode(response.body));
+      }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(
@@ -309,27 +345,46 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
     int? radius = prefs.getInt('radius');
     if (radius != null) {
       if (radiusUser <= radius) {
-        pleaseWait(context);
-        await presensiKeluar(context: context);
-        if (responsePresensiKeluar == 200) {
-          Navigator.pop(context);
-          showTopSnackBar(
-            Overlay.of(context),
-            const CustomSnackBar.success(
-              message: 'Berhasil Checkout',
-            ),
-          );
-          // Navigator.pop(context, false);
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: ((context) => const Navbar())),
-            (route) => false,
-          );
+        await recognitionCheck();
+        if (responseRecognitionCheck == 200) {
+          final result = await Navigator.push(
+              context,
+              CupertinoPageRoute(
+                  builder: ((context) => FaceRecognitionPage(
+                        result: dataRecognition!,
+                      ))));
+          if (result == true) {
+            pleaseWait(context);
+            pleaseWait(context);
+            await presensiKeluar(context: context);
+            if (responsePresensiKeluar == 200) {
+              Navigator.pop(context);
+              showTopSnackBar(
+                Overlay.of(context),
+                const CustomSnackBar.success(
+                  message: 'Berhasil Checkout',
+                ),
+              );
+              // Navigator.pop(context, false);
+              Navigator.pushAndRemoveUntil(
+                context,
+                CupertinoPageRoute(builder: ((context) => const Navbar())),
+                (route) => false,
+              );
+            } else {
+              showTopSnackBar(
+                Overlay.of(context),
+                const CustomSnackBar.error(
+                  message: 'Terjadi Kesalahan',
+                ),
+              );
+            }
+          }
         } else {
           showTopSnackBar(
             Overlay.of(context),
             const CustomSnackBar.error(
-              message: 'Terjadi Kesalahan',
+              message: 'Kamu Belum Melakukan Registrasi Wajah',
             ),
           );
         }

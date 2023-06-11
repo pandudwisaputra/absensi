@@ -1,5 +1,6 @@
 import 'package:absensi/pages/home/profile.dart';
 import 'package:absensi/pages/home/riwayat.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dashboard.dart';
@@ -8,7 +9,7 @@ class Navbar extends StatefulWidget {
   const Navbar({Key? key}) : super(key: key);
 
   static Route route() {
-    return MaterialPageRoute<void>(
+    return CupertinoPageRoute<void>(
       builder: (_) => const Navbar(),
     );
   }

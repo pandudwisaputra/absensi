@@ -1,5 +1,5 @@
-import 'package:absensi/pages/satubulan.dart';
-import 'package:absensi/pages/satuminggu.dart';
+import 'package:absensi/pages/bulanini.dart';
+import 'package:absensi/pages/mingguini.dart';
 import 'package:absensi/pages/semua.dart';
 import 'package:flutter/material.dart';
 
@@ -64,7 +64,7 @@ class RiwayatPage extends StatelessWidget {
                                   color: const Color(0xFFF5F5F5),
                                   borderRadius: BorderRadius.circular(10)),
                               child: const Text(
-                                "1 Minggu",
+                                "Minggu Ini",
                                 style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontSize: 14,
@@ -80,7 +80,7 @@ class RiwayatPage extends StatelessWidget {
                                   color: const Color(0xFFF5F5F5),
                                   borderRadius: BorderRadius.circular(10)),
                               child: const Text(
-                                "1 Bulan",
+                                "Bulan Ini",
                                 style: TextStyle(
                                     fontFamily: 'Inter',
                                     fontSize: 14,
@@ -93,7 +93,7 @@ class RiwayatPage extends StatelessWidget {
                 ),
                 const Expanded(
                   child: TabBarView(
-                    children: [Semua(), SatuMinggu(), SatuBulan()],
+                    children: [Semua(), MingguIni(), BulanIni()],
                   ),
                 )
               ],

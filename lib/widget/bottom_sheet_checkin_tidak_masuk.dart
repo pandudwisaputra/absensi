@@ -78,7 +78,6 @@ class _BottomSheetCheckInTidakMasukState
   }) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? baseUrl = prefs.getString('server');
       int? id = prefs.getInt('idPegawai');
       String tanggalPresensi = DateTime.now().millisecondsSinceEpoch.toString();
       var msg = jsonEncode({
@@ -87,7 +86,8 @@ class _BottomSheetCheckInTidakMasukState
         "keterangan_tidak_masuk": keterangan,
         "link_bukti": linkBukti,
       });
-      var response = await http.post(Uri.parse('$baseUrl/presensitidakmasuk'),
+      var response = await http.post(
+          Uri.parse('http://api.myfin.id:4000/api/presensitidakmasuk'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -317,7 +317,7 @@ class _BottomSheetCheckInTidakMasukState
                         );
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(
+                          CupertinoPageRoute(
                               builder: ((context) => const Navbar())),
                           (route) => false,
                         );

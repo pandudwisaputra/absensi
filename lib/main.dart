@@ -1,10 +1,13 @@
+import 'dart:io';
+
+import 'package:absensi/pages/face_recognition_page.dart';
 import 'package:absensi/pages/jailbroken_check.dart';
 import 'package:absensi/pages/add_face_recognition_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,15 +17,31 @@ void main() async {
       systemNavigationBarColor: Colors.white,
       statusBarColor: Colors.white,
       statusBarIconBrightness: Brightness.dark));
+  await requestPermissions();
   cameras = await getAvailableCameras();
+  secondCameras = await getSecondAvailableCameras();
   await firebase_core.Firebase.initializeApp(
       // options: DefaultFirebaseOptions.currentPlatform,
       );
-  await initializeDateFormatting('id_ID', null)
-      .then((_) => runApp(const MyApp()));
-  SharedPreferences server = await SharedPreferences.getInstance();
-  await server.setString('server', 'http://api.myfin.id:4000/api');
-  // await server.setString('server', 'http://103.174.114.128:4000/api');
+  await initializeDateFormatting('id_ID', null);
+  runApp(const MyApp());
+}
+
+Future<void> requestPermissions() async {
+  Map<Permission, PermissionStatus> statuses = await [
+    Permission.camera,
+    Permission.location,
+    Permission.storage,
+    Permission.microphone,
+  ].request();
+
+  // Periksa status perizinan
+  if (statuses[Permission.location]!.isDenied ||
+      statuses[Permission.camera]!.isDenied ||
+      statuses[Permission.storage]!.isDenied ||
+      statuses[Permission.microphone]!.isDenied) {
+    exit(0);
+  }
 }
 
 class MyApp extends StatefulWidget {
