@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -36,7 +36,6 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       responseEmailCheck = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -69,7 +68,6 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
               },
               body: msg);
       responseSendOtp = response.statusCode;
-      print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(

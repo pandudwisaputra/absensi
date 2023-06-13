@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:absensi/model/check_recognition_model.dart';
 import 'package:absensi/model/recognition.dart';
@@ -6,6 +6,7 @@ import 'package:absensi/ml/recognizer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
 
@@ -107,7 +108,9 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
       InputImage inputImage = getInputImage();
       // Mengirim InputImage ke model deteksi wajah dan mendeteksi wajah-wajah
       List<Face> faces = await faceDetector.processImage(inputImage);
-      print("NUMBER OF FACES =*==*==*==*==*==*=>${faces.length}");
+      if (kDebugMode) {
+        print("NUMBER OF FACES =*==*==*==*==*==*=>${faces.length}");
+      }
       // Melakukan pengenalan wajah pada wajah-wajah yang terdeteksi
       performFaceRecognition(faces);
       if (mounted) {
@@ -147,7 +150,6 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
       }
       recognitions.add(recognition);
       if (recognition.name == widget.result.data.key) {
-        await Future.delayed(const Duration(seconds: 2));
         if (mounted) {
           Navigator.maybePop(context, true);
         }
@@ -190,8 +192,7 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
   }
 
   img.Image _convertYUV420(CameraImage image) {
-    var imag = img.Image(image.width,
-        image.height); // Create Image buffer Membuat | buffer gambar
+    var imag = img.Image(image.width, image.height); // Membuat  buffer gambar
 
     Plane plane = image.planes[0];
     const int shift = (0xFF << 24);
@@ -302,9 +303,14 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
           height: size.height,
           child: Container(
             child: (controller.value.isInitialized)
-                ? AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
-                    child: CameraPreview(controller),
+                ? FittedBox(
+                    fit: BoxFit
+                        .cover, // Menyesuaikan tampilan kamera dengan fit.cover
+                    child: SizedBox(
+                      width: controller.value.previewSize!.height,
+                      height: controller.value.previewSize!.width,
+                      child: CameraPreview(controller),
+                    ),
                   )
                 : Container(),
           ),
@@ -322,7 +328,11 @@ class _FaceRecognitionPageState extends State<FaceRecognitionPage> {
       );
     }
 
-    return SafeArea(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
       child: Scaffold(
         backgroundColor: Colors.black,
         body: Container(

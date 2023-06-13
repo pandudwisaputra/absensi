@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 
@@ -48,7 +48,6 @@ class _UbahKataSandiState extends State<UbahKataSandi> {
             'Accept': "application/json",
           },
           body: msg);
-      print(response.body);
       if (response.statusCode == 200) {
         responseUpdatePassword = response.statusCode;
       } else {

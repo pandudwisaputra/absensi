@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
@@ -66,7 +66,6 @@ class RiwayatRepository {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       if (response.statusCode == 200) {
         Iterable it = jsonDecode(response.body)["data"];
         List<RiwayatModel> listRiwayat =

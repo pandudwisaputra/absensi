@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print, use_build_context_synchronously, unnecessary_new
+// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, use_build_context_synchronously, unnecessary_new
 
 import 'dart:convert';
 import 'package:absensi/model/iduser_model.dart';
@@ -42,14 +42,12 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
           "email": emailRegister,
         },
       );
-      var response =
           await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
               headers: {
                 'X-API-Key': "12345678",
                 'Accept': "application/json",
               },
               body: msg);
-      print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(
@@ -84,7 +82,6 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
             'Accept': "application/json",
           },
           body: msg);
-      print(response.body);
 
       if (response.statusCode == 200) {
         var decode = OtpModel.fromJson(jsonDecode(response.body));
@@ -118,7 +115,6 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       responseGetIdUser = response.statusCode;
       if (response.statusCode == 200) {
         var decode = IdUserModel.fromJson(jsonDecode(response.body));

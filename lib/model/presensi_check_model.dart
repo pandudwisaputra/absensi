@@ -115,7 +115,6 @@ class PresensiCheckRepository {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       if (response.statusCode == 200) {
         PresensiCheckModel decode =
             PresensiCheckModel.fromJson(jsonDecode(response.body));

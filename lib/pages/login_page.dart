@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:async';
 import 'dart:convert';
@@ -47,12 +47,10 @@ class _LoginPageState extends State<LoginPage> {
                   'Accept': "application/json",
                 },
                 body: msg);
-        print(response.body);
         status = response.statusCode;
         if (response.statusCode == 200) {
           var decode = LoginModel.fromJson(jsonDecode(response.body));
           int idPegawai = decode.data.idUser;
-          print('id pegawai = $idPegawai');
           SharedPreferences prefsId = await SharedPreferences.getInstance();
           await prefsId.setInt('idPegawai', idPegawai);
           await prefsId.setBool('isLoggedIn', true);

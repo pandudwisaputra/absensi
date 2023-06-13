@@ -1,8 +1,9 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, override_on_non_overriding_member, avoid_print, file_names, depend_on_referenced_packages
+// ignore_for_file: prefer_typing_uninitialized_variables, override_on_non_overriding_member, depend_on_referenced_packages
 
 import 'dart:math';
 import 'dart:ui';
 import 'package:absensi/model/recognition.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image/image.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart';
@@ -46,7 +47,9 @@ class Recognizer {
     try {
       interpreter =
           await Interpreter.fromAsset(modelName, options: _interpreterOptions);
-      print('Interpreter Created Successfully');
+      if (kDebugMode) {
+        print('Interpreter Created Successfully');
+      }
       _inputShape = interpreter.getInputTensor(0).shape;
       _outputShape = interpreter.getOutputTensor(0).shape;
       _inputType = interpreter.getInputTensor(0).type;
@@ -56,7 +59,9 @@ class Recognizer {
       _probabilityProcessor =
           TensorProcessorBuilder().add(postProcessNormalizeOp).build();
     } catch (e) {
-      print('Unable to create interpreter, Caught Exception: ${e.toString()}');
+      if (kDebugMode) {
+        print('Unable to create interpreter, Caught Exception: ${e.toString()}');
+      }
     }
   }
 
@@ -77,16 +82,22 @@ class Recognizer {
     _inputImage.loadImage(image);
     _inputImage = _preProcess();
     final pre = DateTime.now().millisecondsSinceEpoch - pres;
-    print('Time to load image: $pre ms');
+    if (kDebugMode) {
+      print('Time to load image: $pre ms');
+    }
     final runs = DateTime.now().millisecondsSinceEpoch;
     interpreter.run(_inputImage.buffer, _outputBuffer.getBuffer());
     final run = DateTime.now().millisecondsSinceEpoch - runs;
-    print('Time to run inference: $run ms');
+    if (kDebugMode) {
+      print('Time to run inference: $run ms');
+    }
     //
     _probabilityProcessor.process(_outputBuffer);
     //     .getMapWithFloatValue();
     // final pred = getTopProbability(labeledProb);
-    print(_outputBuffer.getDoubleList());
+    if (kDebugMode) {
+      print(_outputBuffer.getDoubleList());
+    }
     Pair pair = findNearest(_outputBuffer.getDoubleList());
     return Recognition(
         pair.name, location, _outputBuffer.getDoubleList(), pair.distance);
@@ -111,7 +122,6 @@ class Recognizer {
         pair.name = name;
       }
     }
-    print('ini pair: ${pair.name}, ${pair.distance}');
     return pair;
   }
 

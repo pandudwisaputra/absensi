@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:absensi/model/check_karyawan_model.dart';
@@ -47,7 +47,6 @@ class _AktivasiPageState extends State<AktivasiPage> {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       if (response.statusCode == 200) {
         dataKaryawan = CheckKaryawanModel.fromJson(jsonDecode(response.body));
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -84,7 +83,6 @@ class _AktivasiPageState extends State<AktivasiPage> {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       if (response.statusCode == 200) {
         responseUserCheck = response.statusCode;
       } else {
@@ -126,7 +124,6 @@ class _AktivasiPageState extends State<AktivasiPage> {
         await karyawanCheck(
             email: emailAktivasiController.text,
             idKaryawan: kodeAktivasiController.text);
-        print(responseKaryawanCheck);
         if (responseKaryawanCheck == 200) {
           setState(() {
             _state = true;

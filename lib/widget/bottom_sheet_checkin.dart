@@ -1,9 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:absensi/model/check_recognition_model.dart';
 import 'package:absensi/model/presensi_model.dart';
-import 'package:absensi/pages/data_pegawai_page.dart';
 import 'package:absensi/pages/face_recognition_page.dart';
 import 'package:absensi/pages/home/navbar.dart';
 import 'package:absensi/widget/loading_presensi.dart';
@@ -59,7 +58,6 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
             'Accept': "application/json",
           },
           body: msg);
-      print(response.body);
       responsePresensiMasuk = response.statusCode;
       if (response.statusCode == 200) {
         PresensiModel presensi =
@@ -93,7 +91,6 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       responseRecognitionCheck = response.statusCode;
       if (response.statusCode == 200) {
         dataRecognition =
@@ -221,8 +218,6 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
                                     resultLocation.perangkatLongitude,
                                   );
 
-                                  print(
-                                      "Jarak antara dua titik adalah: $distanceInMeters meter");
                                   radiusUser = distanceInMeters.toInt();
                                   return distanceInMeters.toInt();
                                 }
@@ -369,7 +364,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
             pleaseWait(context);
             await presensiMasuk(context: context);
             if (responsePresensiMasuk == 200) {
-              Navigator.pop(context, true);
+              Navigator.pop(context);
               showTopSnackBar(
                 Overlay.of(context),
                 const CustomSnackBar.success(
@@ -382,6 +377,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
                 (route) => false,
               );
             } else {
+              Navigator.pop(context);
               showTopSnackBar(
                 Overlay.of(context),
                 const CustomSnackBar.error(
@@ -394,7 +390,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
           showTopSnackBar(
             Overlay.of(context),
             const CustomSnackBar.error(
-              message: 'Kamu Belum Melakukan Registrasti Wajah',
+              message: 'Kamu Belum Melakukan Registrasi Wajah',
             ),
           );
           Navigator.pop(context);

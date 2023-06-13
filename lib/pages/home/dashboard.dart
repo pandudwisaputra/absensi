@@ -12,7 +12,6 @@ import 'package:absensi/apiLoc/location_service.dart';
 import 'package:absensi/widget/absensi_jam.dart';
 import 'package:absensi/widget/click_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -199,10 +198,6 @@ class _DashboardPageState extends State<DashboardPage> {
                               double latitude = locationUpdater.latitude;
                               double longitude = locationUpdater.longitude;
                               bool isMockLocation = snapshot.data!;
-                              if (kDebugMode) {
-                                print('ini isMockLocation : $isMockLocation');
-                                print('ini isFirstData : $isFirstData');
-                              }
                               if (isMockLocation == true &&
                                   isFirstData == false) {
                                 Future.microtask(() async {

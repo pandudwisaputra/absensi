@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:absensi/model/check_recognition_model.dart';
@@ -45,7 +45,6 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
         "id_presensi": idPresensi,
         "tanggal_presensi": tanggalPresensi,
       });
-      print(DateTime.now().millisecondsSinceEpoch.toString());
       var response = await http.put(
           Uri.parse('http://api.myfin.id:4000/api/presensikeluar'),
           headers: {
@@ -53,7 +52,6 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
             'Accept': "application/json",
           },
           body: msg);
-      print(response.body);
       responsePresensiKeluar = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -81,7 +79,6 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       responseRecognitionCheck = response.statusCode;
       if (response.statusCode == 200) {
         dataRecognition =
@@ -209,8 +206,6 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
                                     resultLocation.perangkatLongitude,
                                   );
 
-                                  print(
-                                      "Jarak antara dua titik adalah: $distanceInMeters meter");
                                   radiusUser = distanceInMeters.toInt();
                                   return distanceInMeters.toInt();
                                 }
@@ -355,7 +350,6 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
                       ))));
           if (result == true) {
             pleaseWait(context);
-            pleaseWait(context);
             await presensiKeluar(context: context);
             if (responsePresensiKeluar == 200) {
               Navigator.pop(context);
@@ -365,13 +359,13 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
                   message: 'Berhasil Checkout',
                 ),
               );
-              // Navigator.pop(context, false);
               Navigator.pushAndRemoveUntil(
                 context,
                 CupertinoPageRoute(builder: ((context) => const Navbar())),
                 (route) => false,
               );
             } else {
+              Navigator.pop(context);
               showTopSnackBar(
                 Overlay.of(context),
                 const CustomSnackBar.error(
@@ -385,6 +379,73 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
             Overlay.of(context),
             const CustomSnackBar.error(
               message: 'Kamu Belum Melakukan Registrasi Wajah',
+            ),
+          );
+          Navigator.pop(context);
+          showDialog(
+            barrierDismissible: true,
+            context: context,
+            builder: (context) => Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              insetPadding: const EdgeInsets.all(10),
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 40),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Info penting!',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        const Text(
+                          'Untuk menggunakan proses check in dan check out kamu harus melakukan registrasi wajah terlebih dulu',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        AbsensiButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          color: const Color(0xFF4285F4),
+                          textColor: Colors.white,
+                          paddingVertical: 10,
+                          text: const Text(
+                            'Tutup',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }

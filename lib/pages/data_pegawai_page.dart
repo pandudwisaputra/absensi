@@ -1,11 +1,23 @@
+// ignore_for_file: use_build_context_synchronously, unnecessary_null_comparison, depend_on_referenced_packages
+
+import 'dart:convert';
+
+import 'package:absensi/helper/exception_handler.dart';
 import 'package:absensi/model/check_karyawan_model.dart';
 import 'package:absensi/model/check_recognition_model.dart';
+import 'package:absensi/model/recognition.dart';
 import 'package:absensi/pages/add_face_recognition_page.dart';
+import 'package:absensi/pages/connection.dart';
 import 'package:absensi/pages/ubah_katasandi_page.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
+import 'package:absensi/widget/loading_presensi.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:top_snackbar_flutter/custom_snack_bar.dart';
+import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class DataPegawaiPage extends StatefulWidget {
   const DataPegawaiPage({super.key});
@@ -15,8 +27,89 @@ class DataPegawaiPage extends StatefulWidget {
 }
 
 class _DataPegawaiPageState extends State<DataPegawaiPage> {
+  int? responseRegister;
   @override
   Widget build(BuildContext context) {
+    Future<void> registerRecognition({
+      required String name,
+      required Rect location,
+      required List<double> embeddings,
+      required double distance,
+    }) async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? key = prefs.getString('namaLengkap');
+      int? idPegawai = prefs.getInt('idPegawai');
+      try {
+        var response = await http.post(
+          Uri.parse('http://api.myfin.id:4000/api/recognition'),
+          headers: {
+            'X-API-Key': '12345678',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({
+            'id_user': idPegawai,
+            'key': key,
+            'name': name,
+            'location_left': location.left.toString(),
+            'location_top': location.top.toString(),
+            'location_right': location.right.toString(),
+            'location_bottom': location.bottom.toString(),
+            'embeddings': embeddings.toString(),
+            'distance': distance.toString(),
+          }),
+        );
+        setState(() {
+          responseRegister = response.statusCode;
+        });
+      } catch (e) {
+        var error = ExceptionHandlers().getExceptionString(e);
+        await Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => ConnectionPage(
+              button: true,
+              error: error,
+            ),
+          ),
+          (route) => false,
+        );
+      }
+    }
+
+    void onPress() async {
+      final result = await Navigator.push(
+          context,
+          CupertinoPageRoute(
+              builder: (context) => const AddFaceRecognitionPage()));
+      if (result != null) {
+        pleaseWait(context);
+        final recognition = result as Recognition;
+        await registerRecognition(
+          name: recognition.name,
+          location: recognition.location,
+          embeddings: recognition.embeddings,
+          distance: recognition.distance,
+        );
+        if (responseRegister == 200) {
+          Navigator.pop(context, true);
+          showTopSnackBar(
+            Overlay.of(context),
+            const CustomSnackBar.success(
+              message: 'Berhasil Menambahkan Data',
+            ),
+          );
+        } else {
+          Navigator.pop(context, true);
+          showTopSnackBar(
+            Overlay.of(context),
+            const CustomSnackBar.error(
+              message: 'Gagal Menambahkan Data',
+            ),
+          );
+        }
+      }
+    }
+
     AppBar appBar() {
       return AppBar(
         leading: IconButton(
@@ -345,11 +438,7 @@ class _DataPegawaiPageState extends State<DataPegawaiPage> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        CupertinoPageRoute(
-                                            builder: (context) =>
-                                                const AddFaceRecognitionPage()));
+                                    onPress();
                                   },
                                   child: const Text(
                                     'Tambah',

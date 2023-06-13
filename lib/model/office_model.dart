@@ -2,7 +2,7 @@
 //
 //     final officeModel = officeModelFromJson(jsonString);
 
-// ignore_for_file: depend_on_referenced_packages, avoid_print
+// ignore_for_file: depend_on_referenced_packages
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
@@ -91,7 +91,6 @@ class OfficeRepository {
         'X-API-Key': "12345678",
         'Accept': "application/json",
       });
-      print(response.body);
       if (response.statusCode == 200) {
         OfficeModel decode = OfficeModel.fromJson(jsonDecode(response.body));
         office = decode;
@@ -100,8 +99,6 @@ class OfficeRepository {
         await prefs.setDouble('longitude', double.parse(decode.data.longitude));
         await prefs.setInt('radius', int.parse(decode.data.radius));
         await prefs.setString('namaKantor', decode.data.namaKantor);
-        print(
-            'LatLng kantor : ${decode.data.latitude} , ${decode.data.longitude}');
       }
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);

@@ -2,7 +2,7 @@
 //
 //     final checkKaryawanModel = checkKaryawanModelFromJson(jsonString);
 
-// ignore_for_file: depend_on_referenced_packages, avoid_print
+// ignore_for_file: depend_on_referenced_packages
 
 import 'dart:convert';
 import 'package:absensi/helper/exception_handler.dart';
@@ -108,7 +108,6 @@ class KaryawanRepository {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      print(response.body);
       if (response.statusCode == 200) {
         CheckKaryawanModel decode =
             CheckKaryawanModel.fromJson(jsonDecode(response.body));

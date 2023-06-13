@@ -9,7 +9,6 @@ import 'dart:convert';
 import 'package:absensi/helper/exception_handler.dart';
 import 'package:absensi/pages/connection.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -109,9 +108,6 @@ class RecognitionRepository {
             'X-API-Key': "12345678",
             'Accept': "application/json",
           });
-      if (kDebugMode) {
-        print(response.body);
-      }
       if (response.statusCode == 200) {
         isAvailable = true;
       } else {

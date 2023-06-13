@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print, use_build_context_synchronously, unnecessary_new
+// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, use_build_context_synchronously, unnecessary_new
 
 import 'dart:convert';
 import 'package:absensi/model/otp_model.dart';
@@ -42,7 +42,6 @@ class _VerifikasiState extends State<Verifikasi> {
     SharedPreferences server = await SharedPreferences.getInstance();
 
     String? idKaryawan = server.getString('idKaryawan');
-    print(idKaryawan);
     try {
       final msg = jsonEncode(
         {
@@ -58,13 +57,11 @@ class _VerifikasiState extends State<Verifikasi> {
                 'Accept': "application/json",
               },
               body: msg);
-      print(response.body);
       var decode = AktivasiModel.fromJson(jsonDecode(response.body));
       setState(() => responseRegister = decode.code);
       if (response.statusCode == 200) {
         var decodeId = AktivasiModel.fromJson(jsonDecode(response.body));
         int idPegawai = decodeId.data.idUser;
-        print('id pegawai = $idPegawai');
         SharedPreferences prefsId = await SharedPreferences.getInstance();
         await prefsId.setInt('idPegawai', idPegawai);
       } else {}
@@ -93,14 +90,12 @@ class _VerifikasiState extends State<Verifikasi> {
           "email": emailRegister,
         },
       );
-      var response =
-          await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
+      await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
               headers: {
                 'X-API-Key': "12345678",
                 'Accept': "application/json",
               },
               body: msg);
-      print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(
@@ -135,7 +130,6 @@ class _VerifikasiState extends State<Verifikasi> {
             'Accept': "application/json",
           },
           body: msg);
-      print(response.body);
 
       if (response.statusCode == 200) {
         var decode = OtpModel.fromJson(jsonDecode(response.body));

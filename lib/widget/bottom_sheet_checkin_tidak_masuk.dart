@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
 
 import 'dart:convert';
 import 'dart:io';
@@ -93,7 +93,6 @@ class _BottomSheetCheckInTidakMasukState
             'Accept': "application/json",
           },
           body: msg);
-      print(response.body);
       responsePresensiMasuk = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -301,7 +300,6 @@ class _BottomSheetCheckInTidakMasukState
                       pleaseWait(context);
                       File resultFile = File(pickedFile!.path!);
                       String linkFile = await uploadFile(resultFile);
-                      print('link file : $linkFile');
 
                       await presensiTidakMasuk(
                           context: context,

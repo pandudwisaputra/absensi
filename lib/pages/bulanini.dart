@@ -64,23 +64,17 @@ class BulanIni extends StatelessWidget {
                 String formatDate =
                     DateFormat("dd MMMM yyyy", "ID").format(parsedDateTime);
 
-                List<String> keteranganMasuk =
-                    resultRiwayat[index].keteranganMasuk.split(" ");
-                String keteranganMasukCapitalize = "";
+                String jamMasuk = resultRiwayat[index].jamMasuk.contains('.') &&
+                        resultRiwayat[index].jamMasuk.split('.')[1].length == 1
+                    ? resultRiwayat[index].jamMasuk.replaceAll(".", ".0")
+                    : resultRiwayat[index].jamMasuk;
 
-                for (String kataSekarang in keteranganMasuk) {
-                  keteranganMasukCapitalize +=
-                      "${kataSekarang[0].toUpperCase()}${kataSekarang.substring(1).toLowerCase()} ";
-                }
-
-                List<String> keteranganKeluar =
-                    resultRiwayat[index].ketaranganKeluar.split(" ");
-                String keteranganKeluarCapitalize = "";
-
-                for (String kataSekarangDua in keteranganKeluar) {
-                  keteranganKeluarCapitalize +=
-                      "${kataSekarangDua[0].toUpperCase()}${kataSekarangDua.substring(1).toLowerCase()} ";
-                }
+                String jamPulang = resultRiwayat[index]
+                            .jamPulang
+                            .contains('.') &&
+                        resultRiwayat[index].jamPulang.split('.')[1].length == 1
+                    ? resultRiwayat[index].jamPulang.replaceAll(".", ".0")
+                    : resultRiwayat[index].jamPulang;
                 return SizedBox(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,27 +118,27 @@ class BulanIni extends StatelessWidget {
                                         text: TextSpan(
                                           children: <TextSpan>[
                                             TextSpan(
-                                                text: keteranganMasukCapitalize,
+                                                text: resultRiwayat[index].keteranganMasuk,
                                                 style: TextStyle(
                                                     fontFamily: 'Inter',
                                                     fontSize: 10,
                                                     color:
-                                                        keteranganMasukCapitalize ==
-                                                                'Telat '
+                                                        resultRiwayat[index].keteranganMasuk ==
+                                                                'Telat'
                                                             ? const Color(
                                                                 0xFFFFBA00)
                                                             : const Color(
                                                                 0xFF00AC47))),
                                             TextSpan(
                                                 text:
-                                                    ' ${resultRiwayat[index].jamMasuk} WIB',
+                                                    ' $jamMasuk WIB',
                                                 style: TextStyle(
                                                     fontFamily: 'Inter',
                                                     fontWeight: FontWeight.w700,
                                                     fontSize: 10,
                                                     color:
-                                                        keteranganMasukCapitalize ==
-                                                                'Telat '
+                                                        resultRiwayat[index].keteranganMasuk ==
+                                                                'Telat'
                                                             ? const Color(
                                                                 0xFFFFBA00)
                                                             : const Color(
@@ -246,42 +240,44 @@ class BulanIni extends StatelessWidget {
                                       ),
                                       RichText(
                                         text: TextSpan(
-                                          children:
-                                              keteranganKeluarCapitalize == '- '
-                                                  ? <TextSpan>[
-                                                      const TextSpan(
-                                                          text: 'BELUM KELUAR',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'Inter',
-                                                              fontSize: 10,
-                                                              color: Color(
-                                                                  0xFFEA4435))),
-                                                    ]
-                                                  : <TextSpan>[
-                                                      TextSpan(
-                                                          text:
-                                                              keteranganKeluarCapitalize,
-                                                          style: const TextStyle(
-                                                              fontFamily:
-                                                                  'Inter',
-                                                              fontSize: 10,
-                                                              color: Color(
-                                                                  0xFFEA4435))),
-                                                      TextSpan(
-                                                          text:
-                                                              ' ${resultRiwayat[index].jamPulang} WIB',
-                                                          style: const TextStyle(
-                                                              fontFamily:
-                                                                  'Inter',
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              fontSize: 10,
-                                                              color: Color(
-                                                                  0xFFEA4435))),
-                                                    ],
-                                        ),
+                                            children: resultRiwayat[index]
+                                                        .status ==
+                                                    'Selesai'
+                                                ? <TextSpan>[
+                                                    TextSpan(
+                                                        text:
+                                                            resultRiwayat[index].ketaranganKeluar,
+                                                        style: const TextStyle(
+                                                            fontFamily: 'Inter',
+                                                            fontSize: 10,
+                                                            color: Color(
+                                                                0xFFEA4435))),
+                                                    resultRiwayat[index]
+                                                                .jamPulang !=
+                                                            '-'
+                                                        ? TextSpan(
+                                                            text:
+                                                                ' $jamPulang WIB',
+                                                            style: const TextStyle(
+                                                                fontFamily:
+                                                                    'Inter',
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700,
+                                                                fontSize: 10,
+                                                                color: Color(
+                                                                    0xFFEA4435)))
+                                                        : const TextSpan()
+                                                  ]
+                                                : <TextSpan>[
+                                                    const TextSpan(
+                                                        text: 'BELUM KELUAR',
+                                                        style: TextStyle(
+                                                            fontFamily: 'Inter',
+                                                            fontSize: 10,
+                                                            color: Color(
+                                                                0xFFEA4435))),
+                                                  ]),
                                       )
                                     ],
                                   ),

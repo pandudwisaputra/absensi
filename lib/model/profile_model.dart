@@ -2,7 +2,7 @@
 //
 //     final profileModel = profileModelFromJson(jsonString);
 
-// ignore_for_file: depend_on_referenced_packages, avoid_print
+// ignore_for_file: depend_on_referenced_packages
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
@@ -88,7 +88,6 @@ class ProfileRepository {
         'X-API-Key': "12345678",
         'Accept': "application/json",
       });
-      print(response.body);
       if (response.statusCode == 200) {
         ProfileModel decode = ProfileModel.fromJson(jsonDecode(response.body));
         profil = decode;

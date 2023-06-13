@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/cupertino.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -38,11 +36,9 @@ class LocationRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('userLatitude', perangkatLatitude.toString());
       await prefs.setString('userLongitude', perangkatLongitude.toString());
-      print(
-          'LatLng perangkat : ${currentPosition.latitude}, ${currentPosition.longitude}');
       nameLocation =
           '${placeName[0].subLocality!}, ${placeName[0].locality!}, ${placeName[0].subAdministrativeArea!}, ${placeName[0].administrativeArea!}, ${placeName[0].country!}, ${placeName[0].postalCode!}';
-      print('lokasi perangkat : $nameLocation');
+
       await prefs.setString('userLocation', nameLocation);
       place = placeName[0].street;
     } catch (e) {

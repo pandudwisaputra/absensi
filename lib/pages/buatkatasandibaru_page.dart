@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages, avoid_print, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages,use_build_context_synchronously
 
 import 'dart:convert';
 import 'package:absensi/helper/exception_handler.dart';
@@ -44,7 +44,6 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
               },
               body: msg);
       responseSendOtp = response.statusCode;
-      print(response.body);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(

@@ -163,7 +163,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Accept': "application/json",
               },
               body: msg);
-      print(response.body);
       responseUpdateAva = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);

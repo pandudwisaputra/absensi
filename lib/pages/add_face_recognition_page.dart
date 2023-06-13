@@ -1,13 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api, avoid_print, use_build_context_synchronously
-import 'dart:convert';
 
-import 'package:absensi/helper/exception_handler.dart';
 import 'package:absensi/model/face_detector_painter.dart';
-import 'package:absensi/pages/connection.dart';
-import 'package:absensi/pages/home/navbar.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
 import 'package:absensi/model/recognition.dart';
+import 'package:flutter/services.dart';
 import 'package:absensi/ml/recognizer.dart';
 import 'package:absensi/widget/absensi_button.dart';
 import 'package:flutter/foundation.dart';
@@ -15,9 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:top_snackbar_flutter/custom_snack_bar.dart';
-import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 Future<List<CameraDescription>> getAvailableCameras() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +26,6 @@ class AddFaceRecognitionPage extends StatefulWidget {
 }
 
 class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
-  int? responseRegister;
   dynamic controller;
   bool isBusy = false;
   late Size size;
@@ -193,9 +184,9 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        // Recognizer.registered.putIfAbsent(
-                        //     textEditingController.text, () => recognition);
-                        onPress(context: context, recognition: recognition);
+                        // onPress(context: context, recognition: recognition);
+                        Navigator.pop(context);
+                        Navigator.pop(context, recognition);
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
@@ -290,53 +281,6 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
     );
   }
 
-  Future<void> registerRecognition({
-    required String name,
-    required Rect location,
-    required List<double> embeddings,
-    required double distance,
-  }) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? key = prefs.getString('namaLengkap');
-    int? idPegawai = prefs.getInt('idPegawai');
-    try {
-      var response = await http.post(
-        Uri.parse('http://api.myfin.id:4000/api/recognition'),
-        headers: {
-          'X-API-Key': '12345678',
-          'Accept': 'application/json',
-        },
-        body: jsonEncode({
-          'id_user': idPegawai,
-          'key': key,
-          'name': name,
-          'location_left': location.left.toString(),
-          'location_top': location.top.toString(),
-          'location_right': location.right.toString(),
-          'location_bottom': location.bottom.toString(),
-          'embeddings': embeddings.toString(),
-          'distance': distance.toString(),
-        }),
-      );
-      print(response.body);
-      setState(() {
-        responseRegister = response.statusCode;
-      });
-    } catch (e) {
-      var error = ExceptionHandlers().getExceptionString(e);
-      await Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(
-          builder: (context) => ConnectionPage(
-            button: true,
-            error: error,
-          ),
-        ),
-        (route) => false,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     List<Widget> stackChildren = [];
@@ -351,9 +295,14 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
           height: size.height,
           child: Container(
             child: (controller.value.isInitialized)
-                ? AspectRatio(
-                    aspectRatio: controller.value.aspectRatio,
-                    child: CameraPreview(controller),
+                ? FittedBox(
+                    fit: BoxFit
+                        .cover, // Menyesuaikan tampilan kamera dengan fit.cover
+                    child: SizedBox(
+                      width: controller.value.previewSize!.height,
+                      height: controller.value.previewSize!.width,
+                      child: CameraPreview(controller),
+                    ),
                   )
                 : Container(),
           ),
@@ -390,7 +339,11 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
       ),
     );
 
-    return SafeArea(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+      ),
       child: Scaffold(
         backgroundColor: Colors.black,
         body: Container(
@@ -401,37 +354,5 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
             )),
       ),
     );
-  }
-
-  void onPress({
-    required BuildContext context,
-    required Recognition recognition,
-  }) async {
-    await registerRecognition(
-      name: recognition.name,
-      location: recognition.location,
-      embeddings: recognition.embeddings,
-      distance: recognition.distance,
-    );
-    if (responseRegister == 200) {
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.success(
-          message: 'Berhasil Menambahkan Data',
-        ),
-      );
-      await Navigator.pushAndRemoveUntil(
-        context,
-        CupertinoPageRoute(builder: (context) => const Navbar()),
-        (route) => false,
-      );
-    } else {
-      showTopSnackBar(
-        Overlay.of(context),
-        const CustomSnackBar.error(
-          message: 'Gagal Menambahkan Data',
-        ),
-      );
-    }
   }
 }
