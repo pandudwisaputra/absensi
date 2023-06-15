@@ -20,7 +20,8 @@ import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 
 class DataPegawaiPage extends StatefulWidget {
-  const DataPegawaiPage({super.key});
+  final String ava;
+  const DataPegawaiPage({super.key, required this.ava});
 
   @override
   State<DataPegawaiPage> createState() => _DataPegawaiPageState();
@@ -217,10 +218,9 @@ class _DataPegawaiPageState extends State<DataPegawaiPage> {
                           Center(
                             child: CircleAvatar(
                               radius: 80,
-                              backgroundImage: NetworkImage(karyawan
-                                          .data.foto !=
+                              backgroundImage: NetworkImage(widget.ava !=
                                       '-'
-                                  ? karyawan.data.foto
+                                  ? widget.ava
                                   : 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'),
                             ),
                           ),

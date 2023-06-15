@@ -36,6 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
   XFile? _profile;
   final picker = ImagePicker();
   CroppedFile? _croppedFile;
+  String ava = '-';
 
   void _showPicker(context) {
     showModalBottomSheet(
@@ -348,6 +349,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         );
                       } else if (snapshot.hasData) {
                         ProfileModel profile = snapshot.data!;
+                        ava = profile.data.avatar;
                         return Row(
                           children: [
                             Stack(
@@ -453,7 +455,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   Navigator.push(
                       context,
                       CupertinoPageRoute(
-                          builder: (context) => const DataPegawaiPage()));
+                          builder: (context) => DataPegawaiPage(
+                                ava: ava,
+                              )));
                 },
                 splashColor: Colors.transparent,
                 highlightColor: Colors.transparent,

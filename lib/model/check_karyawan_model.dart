@@ -47,7 +47,6 @@ class Data {
     required this.idKaryawan,
     required this.idJabatan,
     required this.namaLengkap,
-    required this.foto,
     required this.alamat,
     required this.agama,
     required this.email,
@@ -59,7 +58,6 @@ class Data {
   String idKaryawan;
   int idJabatan;
   String namaLengkap;
-  String foto;
   String alamat;
   String agama;
   String email;
@@ -71,7 +69,6 @@ class Data {
         idKaryawan: json["id_karyawan"],
         idJabatan: json["id_jabatan"],
         namaLengkap: json["nama_lengkap"],
-        foto: json["foto"],
         alamat: json["alamat"],
         agama: json["agama"],
         email: json["email"],
@@ -84,7 +81,6 @@ class Data {
         "id_karyawan": idKaryawan,
         "id_jabatan": idJabatan,
         "nama_lengkap": namaLengkap,
-        "foto": foto,
         "alamat": alamat,
         "agama": agama,
         "email": email,
