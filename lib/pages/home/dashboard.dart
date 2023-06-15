@@ -262,8 +262,12 @@ class _DashboardPageState extends State<DashboardPage> {
                                                     height: 10,
                                                   ),
                                                   AbsensiButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
+                                                    onPressed: () async {
+                                                      SharedPreferences prefs =
+                                                          await SharedPreferences
+                                                              .getInstance();
+                                                      await prefs.setBool(
+                                                          'isLoggedIn', false);
                                                       exit(0);
                                                     },
                                                     color:

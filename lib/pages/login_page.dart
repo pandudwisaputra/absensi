@@ -1,8 +1,10 @@
-// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously
+// ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, unused_import
 
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:absensi/model/check_status_karyawan_model.dart';
+import 'package:absensi/model/false_model.dart';
 import 'package:absensi/pages/lupakatasandi_page.dart';
 import 'package:absensi/pages/aktivasi_page.dart';
 import 'package:absensi/widget/absensi_button.dart';
@@ -31,6 +33,8 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController passcontroller = TextEditingController();
   int? status;
+  int? statusKaryawan;
+  String? dataStatusKaryawan;
   bool? _state = false;
 
   @override
@@ -38,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
     Future<void> loginPegawai(
         {required String email, required String password}) async {
       try {
-
         final msg = jsonEncode({"email": email, "password": password});
         var response =
             await http.post(Uri.parse('http://api.myfin.id:4000/api/login'),
@@ -70,6 +73,36 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
 
+    Future<void> statusKaryawanCheck({required String email}) async {
+      try {
+        var response = await http.get(
+            Uri.parse(
+                'http://api.myfin.id:4000/api/statuskaryawancheck/$email'),
+            headers: {
+              'X-API-Key': "12345678",
+              'Accept': "application/json",
+            });
+        statusKaryawan = response.statusCode;
+        if (response.statusCode == 200) {
+          var decode =
+              CheckStatusKaryawanModel.fromJson(jsonDecode(response.body));
+          dataStatusKaryawan = decode.data.statusKaryawan;
+        } 
+      } catch (e) {
+        var error = ExceptionHandlers().getExceptionString(e);
+        await Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => ConnectionPage(
+              button: true,
+              error: error,
+            ),
+          ),
+          (route) => false,
+        );
+      }
+    }
+
     bool validateEmail(String email) {
       String pattern =
           r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
@@ -86,24 +119,46 @@ class _LoginPageState extends State<LoginPage> {
             _state = true;
           });
         }
-
         await loginPegawai(
           email: emailcontroller.text,
           password: passcontroller.text,
         );
         if (status == 200) {
-          setState(() {
-            _state = true;
-          });
-          await Navigator.pushAndRemoveUntil(
-            context,
-            CupertinoPageRoute(builder: (context) => const Navbar()),
-            (route) => false,
-          );
+          if (mounted) {
+            setState(() {
+              _state = true;
+            });
+          }
+          await statusKaryawanCheck(email: emailcontroller.text);
+          if (statusKaryawan == 200) {
+            setState(() {
+              _state = true;
+            });
+            if (dataStatusKaryawan == 'active') {
+              setState(() {
+                _state = true;
+              });
+              await Navigator.pushAndRemoveUntil(
+                context,
+                CupertinoPageRoute(builder: (context) => const Navbar()),
+                (route) => false,
+              );
 
-          setState(() {
-            _state = false;
-          });
+              setState(() {
+                _state = false;
+              });
+            } else {
+              setState(() {
+                _state = false;
+              });
+              showTopSnackBar(
+                Overlay.of(context),
+                const CustomSnackBar.error(
+                  message: 'Akun Anda Telah Dinonaktifkan',
+                ),
+              );
+            }
+          } 
         } else {
           setState(() {
             _state = false;
