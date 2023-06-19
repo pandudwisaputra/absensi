@@ -91,10 +91,7 @@ class Recognizer {
     if (kDebugMode) {
       print('Time to run inference: $run ms');
     }
-    //
     _probabilityProcessor.process(_outputBuffer);
-    //     .getMapWithFloatValue();
-    // final pred = getTopProbability(labeledProb);
     if (kDebugMode) {
       print(_outputBuffer.getDoubleList());
     }
@@ -103,8 +100,6 @@ class Recognizer {
         pair.name, location, _outputBuffer.getDoubleList(), pair.distance);
   }
 
-  //  looks for the nearest embeeding in the dataset
-  // and retrurns the pair <id, distance>
   // Mencari embedding terdekat dalam dataset dan mengembalikan pasangan <id, distance>
   findNearest(List<double> emb) {
     Pair pair = Pair("Unknown", -5);

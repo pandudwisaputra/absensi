@@ -46,7 +46,7 @@ class Semua extends StatelessWidget {
           } else if (snapshot.hasData) {
             List<RiwayatModel> listRiwayat = snapshot.data;
             listRiwayat
-                .sort((a, b) => b.tanggalPresensi.compareTo(a.tanggalPresensi));
+                .sort((a, b) => b.idPresensi.compareTo(a.idPresensi));
             return ListView.builder(
               physics: const BouncingScrollPhysics(),
               itemCount: listRiwayat.length,

@@ -66,9 +66,7 @@ class MingguIni extends StatelessWidget {
                 resultRiwayat.add(list);
               }
             }
-            resultRiwayat
-                .sort((a, b) => b.tanggalPresensi.compareTo(a.tanggalPresensi));
-
+            resultRiwayat.sort((a, b) => b.idPresensi.compareTo(a.idPresensi));
             return ListView.builder(
               physics: const BouncingScrollPhysics(),
               itemCount: resultRiwayat.length,

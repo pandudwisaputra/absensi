@@ -296,8 +296,7 @@ class _AddFaceRecognitionPageState extends State<AddFaceRecognitionPage> {
           child: Container(
             child: (controller.value.isInitialized)
                 ? FittedBox(
-                    fit: BoxFit
-                        .cover, // Menyesuaikan tampilan kamera dengan fit.cover
+                    fit: BoxFit.cover,
                     child: SizedBox(
                       width: controller.value.previewSize!.height,
                       height: controller.value.previewSize!.width,
