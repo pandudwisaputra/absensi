@@ -1,13 +1,13 @@
 import 'package:absensi/model/riwayat_model.dart';
+import 'package:absensi/pages/pdf_view.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
 import 'package:absensi/widget/not_found.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 class Semua extends StatelessWidget {
   const Semua({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -45,8 +45,7 @@ class Semua extends StatelessWidget {
                 });
           } else if (snapshot.hasData) {
             List<RiwayatModel> listRiwayat = snapshot.data;
-            listRiwayat
-                .sort((a, b) => b.idPresensi.compareTo(a.idPresensi));
+            listRiwayat.sort((a, b) => b.idPresensi.compareTo(a.idPresensi));
             return ListView.builder(
               physics: const BouncingScrollPhysics(),
               itemCount: listRiwayat.length,
@@ -55,14 +54,14 @@ class Semua extends StatelessWidget {
                     int.parse(listRiwayat[index].tanggalPresensi));
                 String formatDate =
                     DateFormat("dd MMMM yyyy", "ID").format(parsedDateTime);
-                String jamMasuk = listRiwayat[index].jamMasuk.contains('.') &&
-                        listRiwayat[index].jamMasuk.split('.')[1].length == 1
-                    ? listRiwayat[index].jamMasuk.replaceAll(".", ".0")
+                String jamMasuk = listRiwayat[index].jamMasuk.contains(':') &&
+                        listRiwayat[index].jamMasuk.split(':')[1].length == 1
+                    ? listRiwayat[index].jamMasuk.replaceAll(":", ":0")
                     : listRiwayat[index].jamMasuk;
 
-                String jamPulang = listRiwayat[index].jamPulang.contains('.') &&
-                        listRiwayat[index].jamPulang.split('.')[1].length == 1
-                    ? listRiwayat[index].jamPulang.replaceAll(".", ".0")
+                String jamPulang = listRiwayat[index].jamPulang.contains(':') &&
+                        listRiwayat[index].jamPulang.split(':')[1].length == 1
+                    ? listRiwayat[index].jamPulang.replaceAll(":", ":0")
                     : listRiwayat[index].jamPulang;
 
                 return SizedBox(
@@ -186,23 +185,36 @@ class Semua extends StatelessWidget {
                                 ],
                               ),
                             )
-                          : Container(
-                              width: double.infinity,
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.symmetric(vertical: 35),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: const Color(0xFFF5F5F5),
-                              ),
-                              child: Center(
-                                  child: Text(
-                                listRiwayat[index].keteranganMasuk,
-                                style: const TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
+                          : GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => PdfViewPage(
+                                      linkBukti: listRiwayat[index].linkBukti,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 35),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: const Color(0xFFF5F5F5),
                                 ),
-                              )),
+                                child: Center(
+                                    child: Text(
+                                  listRiwayat[index].keteranganTidakMasuk,
+                                  style: const TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
+                                )),
+                              ),
                             ),
                       listRiwayat[index].keteranganMasuk != 'Tidak Masuk'
                           ? Container(

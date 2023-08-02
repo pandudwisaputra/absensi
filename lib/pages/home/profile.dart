@@ -1,8 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
-import 'dart:io' as io;
 import 'package:absensi/helper/exception_handler.dart';
+import 'package:absensi/model/uploadimage_model.dart';
 import 'package:absensi/pages/connection.dart';
 import 'package:absensi/pages/data_pegawai_page.dart';
 import 'package:absensi/pages/login_page.dart';
@@ -11,10 +11,8 @@ import 'package:absensi/widget/click_image.dart';
 import 'package:absensi/widget/loading_presensi.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:path/path.dart';
 import 'package:absensi/model/profile_model.dart';
 import 'package:absensi/widget/absensi_shimmer.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -88,16 +86,13 @@ class _ProfilePageState extends State<ProfilePage> {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: _profile!.path,
         compressFormat: ImageCompressFormat.jpg,
-        compressQuality: 100,
+        compressQuality: 90,
         uiSettings: [
           AndroidUiSettings(
             toolbarTitle: 'Cropper',
             toolbarWidgetColor: Colors.black,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false,
-          ),
-          IOSUiSettings(
-            title: 'Cropper',
           ),
         ],
       );
@@ -106,31 +101,26 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           _croppedFile = croppedFile;
         });
-        uploadImage(context);
+        uploadImage(context, _croppedFile!.path);
       }
       if (croppedFile == null) return;
     }
   }
 
-  Future<void> uploadImage(BuildContext context) async {
-    String fileName = basename(_croppedFile!.path);
-    Reference ref =
-        FirebaseStorage.instance.ref().child('profile_picture/$fileName');
-    final metadata = SettableMetadata(
-        contentType: 'image/jpeg',
-        customMetadata: {'picked-file-path': fileName});
-    UploadTask uploadTask = ref.putFile(io.File(_croppedFile!.path), metadata);
-    await Future.value(uploadTask);
-    Future.value(uploadTask)
-        .then((value) => {print("Upload file path ${value.ref.fullPath}")})
-        .onError((error, stackTrace) =>
-            {print("Upload file path error ${error.toString()} ")});
+  Future<void> uploadImage(BuildContext context, String filePath) async {
+    try {
+      String url = 'http://api2.myfin.id/updateimagemobile/uploadimagemobile';
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+      request.files.add(await http.MultipartFile.fromPath('file', filePath));
 
-    await uploadTask.whenComplete(() async {
-      var urlprofile = await uploadTask.snapshot.ref.getDownloadURL();
-      var result = urlprofile.toString();
-      await updateAva(context: context, ava: result);
-      if (responseUpdateAva == 200) {
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var responseString = await response.stream.bytesToString();
+        var decodeId =
+            UploadImageModel.fromJson(jsonDecode(responseString));
+        ava = decodeId.fileName;
+        updateAva(context: context, ava: ava);
         Navigator.pop(context);
         showTopSnackBar(
           Overlay.of(context),
@@ -147,9 +137,13 @@ class _ProfilePageState extends State<ProfilePage> {
             message: 'Terjadi Kesalahan',
           ),
         );
+
       }
-    });
+    } catch (e) {
+      print(e);
+    }
   }
+
 
   Future<void> updateAva(
       {required BuildContext context, required String ava}) async {
@@ -158,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
       int? id = prefs.getInt('idPegawai');
       var msg = jsonEncode({"id_user": id, "ava": ava});
       var response =
-          await http.post(Uri.parse('http://api.myfin.id:4000/api/updateava'),
+          await http.post(Uri.parse('http://api2.myfin.id:4500/api/updateava'),
               headers: {
                 'X-API-Key': "12345678",
                 'Accept': "application/json",
@@ -358,17 +352,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                 GestureDetector(
                                   onTap: () {
                                     clickImage(
-                                        context,
-                                        profile.data.avatar == '-'
-                                            ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                            : profile.data.avatar);
+                                      context,
+                                      profile.data.avatar == '-'
+                                          ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
+                                          : 'http://api2.myfin.id/upload/${profile.data.avatar}',
+                                    );
                                   },
                                   child: CircleAvatar(
                                     radius: 35,
                                     backgroundImage: NetworkImage(
                                       profile.data.avatar == '-'
                                           ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                          : profile.data.avatar,
+                                          : 'http://api2.myfin.id/upload/${profile.data.avatar}',
                                     ),
                                   ),
                                 ),

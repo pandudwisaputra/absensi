@@ -34,7 +34,6 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
 
   Future<void> sendOtp() async {
     try {
-
       SharedPreferences email = await SharedPreferences.getInstance();
       String? emailRegister = email.getString('emailRegister');
       final msg = jsonEncode(
@@ -42,12 +41,12 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
           "email": emailRegister,
         },
       );
-          await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
-              headers: {
-                'X-API-Key': "12345678",
-                'Accept': "application/json",
-              },
-              body: msg);
+      await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          },
+          body: msg);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(
@@ -67,7 +66,6 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
     required String email,
     required String otp,
   }) async {
-
     try {
       final msg = jsonEncode(
         {
@@ -76,7 +74,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
         },
       );
       var response = await http.post(
-          Uri.parse('http://api.myfin.id:4000/api/otpvalidation'),
+          Uri.parse('http://api2.myfin.id:4500/api/otpvalidation'),
           headers: {
             "X-API-Key": "12345678",
             'Accept': "application/json",
@@ -110,7 +108,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
   Future<void> getIdUser() async {
     try {
       var response = await http.get(
-          Uri.parse('http://api.myfin.id:4000/api/getiduser/${widget.email}'),
+          Uri.parse('http://api2.myfin.id:4500/api/getiduser/${widget.email}'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

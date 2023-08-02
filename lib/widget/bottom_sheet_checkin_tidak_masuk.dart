@@ -44,7 +44,10 @@ class _BottomSheetCheckInTidakMasukState
   final _formKey = GlobalKey<FormState>();
 
   Future selectFile() async {
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
     if (result == null) return;
 
     if (mounted) {
@@ -63,6 +66,7 @@ class _BottomSheetCheckInTidakMasukState
     UploadTask task = ref.putFile(
       file,
       SettableMetadata(
+        contentType: 'pdf',
         customMetadata: {'picked-file-path': fileName},
       ),
     );
@@ -87,7 +91,7 @@ class _BottomSheetCheckInTidakMasukState
         "link_bukti": linkBukti,
       });
       var response = await http.post(
-          Uri.parse('http://api.myfin.id:4000/api/presensitidakmasuk'),
+          Uri.parse('http://api2.myfin.id:4500/api/presensitidakmasuk'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

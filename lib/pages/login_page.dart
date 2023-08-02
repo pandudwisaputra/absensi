@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:absensi/model/check_status_karyawan_model.dart';
 import 'package:absensi/model/false_model.dart';
+import 'package:absensi/model/smartphonecheck_model.dart';
 import 'package:absensi/pages/lupakatasandi_page.dart';
 import 'package:absensi/pages/aktivasi_page.dart';
 import 'package:absensi/widget/absensi_button.dart';
@@ -13,6 +14,7 @@ import 'package:absensi/pages/home/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_device_identifier/flutter_device_identifier.dart';
 import 'package:top_snackbar_flutter/custom_snack_bar.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +37,30 @@ class _LoginPageState extends State<LoginPage> {
   int? status;
   int? statusKaryawan;
   String? dataStatusKaryawan;
+  int? statusSmartphone;
+  String? dataAndroidIdSmartphone;
   bool? _state = false;
+  String? _androidId;
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+
+  Future<void> initPlatformState() async {
+    String androidId;
+    try {
+      androidId = await FlutterDeviceIdentifier.androidID;
+    } on PlatformException {
+      androidId = 'Failed to get android ID.';
+    }
+    if (!mounted) return;
+
+    setState(() {
+      _androidId = androidId;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
       try {
         final msg = jsonEncode({"email": email, "password": password});
         var response =
-            await http.post(Uri.parse('http://api.myfin.id:4000/api/login'),
+            await http.post(Uri.parse('http://api2.myfin.id:4500/api/login'),
                 headers: {
                   'X-API-Key': "12345678",
                   'Accept': "application/json",
@@ -77,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
       try {
         var response = await http.get(
             Uri.parse(
-                'http://api.myfin.id:4000/api/statuskaryawancheck/$email'),
+                'http://api2.myfin.id:4500/api/statuskaryawancheck/$email'),
             headers: {
               'X-API-Key': "12345678",
               'Accept': "application/json",
@@ -87,7 +112,37 @@ class _LoginPageState extends State<LoginPage> {
           var decode =
               CheckStatusKaryawanModel.fromJson(jsonDecode(response.body));
           dataStatusKaryawan = decode.data.statusKaryawan;
-        } 
+        }
+      } catch (e) {
+        var error = ExceptionHandlers().getExceptionString(e);
+        await Navigator.pushAndRemoveUntil(
+          context,
+          CupertinoPageRoute(
+            builder: (context) => ConnectionPage(
+              button: true,
+              error: error,
+            ),
+          ),
+          (route) => false,
+        );
+      }
+    }
+
+    Future<void> smartphoneCheck() async {
+      try {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        int? idUser = prefs.getInt('idPegawai');
+        var response = await http.get(
+            Uri.parse('http://api2.myfin.id:4500/api/smartphonecheck/$idUser'),
+            headers: {
+              'X-API-Key': "12345678",
+              'Accept': "application/json",
+            });
+        statusSmartphone = response.statusCode;
+        if (response.statusCode == 200) {
+          var decode = SmartphoneCheckModel.fromJson(jsonDecode(response.body));
+          dataAndroidIdSmartphone = decode.data.androidId;
+        }
       } catch (e) {
         var error = ExceptionHandlers().getExceptionString(e);
         await Navigator.pushAndRemoveUntil(
@@ -138,15 +193,32 @@ class _LoginPageState extends State<LoginPage> {
               setState(() {
                 _state = true;
               });
-              await Navigator.pushAndRemoveUntil(
-                context,
-                CupertinoPageRoute(builder: (context) => const Navbar()),
-                (route) => false,
-              );
-
-              setState(() {
-                _state = false;
-              });
+              await smartphoneCheck();
+              if (statusSmartphone == 200) {
+                setState(() {
+                  _state = true;
+                });
+                if (dataAndroidIdSmartphone == _androidId) {
+                  await Navigator.pushAndRemoveUntil(
+                    context,
+                    CupertinoPageRoute(builder: (context) => const Navbar()),
+                    (route) => false,
+                  );
+                  setState(() {
+                    _state = false;
+                  });
+                } else {
+                  setState(() {
+                    _state = false;
+                  });
+                  showTopSnackBar(
+                    Overlay.of(context),
+                    const CustomSnackBar.error(
+                      message: 'Mohon Login Dengan Smartphone Pribadi',
+                    ),
+                  );
+                }
+              }
             } else {
               setState(() {
                 _state = false;
@@ -158,7 +230,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               );
             }
-          } 
+          }
         } else {
           setState(() {
             _state = false;

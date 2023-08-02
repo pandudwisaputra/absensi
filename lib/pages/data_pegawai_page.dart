@@ -42,7 +42,7 @@ class _DataPegawaiPageState extends State<DataPegawaiPage> {
       int? idPegawai = prefs.getInt('idPegawai');
       try {
         var response = await http.post(
-          Uri.parse('http://api.myfin.id:4000/api/recognition'),
+          Uri.parse('http://api2.myfin.id:4500/api/recognition'),
           headers: {
             'X-API-Key': '12345678',
             'Accept': 'application/json',
@@ -218,8 +218,7 @@ class _DataPegawaiPageState extends State<DataPegawaiPage> {
                           Center(
                             child: CircleAvatar(
                               radius: 80,
-                              backgroundImage: NetworkImage(widget.ava !=
-                                      '-'
+                              backgroundImage: NetworkImage(widget.ava != '-'
                                   ? widget.ava
                                   : 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'),
                             ),

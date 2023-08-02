@@ -110,7 +110,7 @@ class PresensiCheckRepository {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? id = prefs.getInt('idPegawai');
       var response = await http.get(
-          Uri.parse('http://api.myfin.id:4000/api/presensicheck/$id'),
+          Uri.parse('http://api2.myfin.id:4500/api/presensicheck/$id'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

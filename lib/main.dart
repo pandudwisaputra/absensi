@@ -33,13 +33,15 @@ Future<void> requestPermissions() async {
     Permission.location,
     Permission.storage,
     Permission.microphone,
+    Permission.phone
   ].request();
 
   // Periksa status perizinan
   if (statuses[Permission.location]!.isDenied ||
       statuses[Permission.camera]!.isDenied ||
       statuses[Permission.storage]!.isDenied ||
-      statuses[Permission.microphone]!.isDenied) {
+      statuses[Permission.microphone]!.isDenied ||
+      statuses[Permission.phone]!.isDenied) {
     exit(0);
   }
 }

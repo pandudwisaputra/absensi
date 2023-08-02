@@ -30,14 +30,13 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
 
   Future<void> sendOtp({required String email}) async {
     try {
-
       final msg = jsonEncode(
         {
           "email": email,
         },
       );
       var response =
-          await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
+          await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
               headers: {
                 'X-API-Key': "12345678",
                 'Accept': "application/json",
@@ -127,169 +126,169 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
 
     Widget content() {
       return SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height - 50,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: const EdgeInsets.only(left: 30, right: 30),
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0x24000000),
-                    ),
-                    borderRadius: BorderRadius.circular(15),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height - 50,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const SizedBox(),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                margin: const EdgeInsets.only(left: 30, right: 30),
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0x24000000),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Center(
-                        child: Text(
-                          'Data Pegawai',
-                          style: TextStyle(
-                            fontFamily: 'Inter',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const Text(
-                        'Nama Lengkap :',
-                        style: TextStyle(
-                            fontFamily: 'Open Sans',
-                            fontSize: 15,
-                            color: Color(0xFFA8A8A8)),
-                      ),
-                      const SizedBox(
-                        height: 3,
-                      ),
-                      Text(
-                        widget.dataKaryawan.data.namaLengkap,
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            color: Color(0xFF4285F4),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        'Alamat :',
-                        style: TextStyle(
-                            fontFamily: 'Open Sans',
-                            fontSize: 15,
-                            color: Color(0xFFA8A8A8)),
-                      ),
-                      const SizedBox(
-                        height: 3,
-                      ),
-                      Text(
-                        widget.dataKaryawan.data.alamat,
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            color: Color(0xFF4285F4),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        'No Hp :',
-                        style: TextStyle(
-                            fontFamily: 'Open Sans',
-                            fontSize: 15,
-                            color: Color(0xFFA8A8A8)),
-                      ),
-                      const SizedBox(
-                        height: 3,
-                      ),
-                      Text(
-                        widget.dataKaryawan.data.noHp,
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            color: Color(0xFF4285F4),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      const Text(
-                        'Jabatan :',
-                        style: TextStyle(
-                            fontFamily: 'Open Sans',
-                            fontSize: 15,
-                            color: Color(0xFFA8A8A8)),
-                      ),
-                      const SizedBox(
-                        height: 3,
-                      ),
-                      Text(
-                        widget.dataKaryawan.data.jabatan,
-                        style: const TextStyle(
-                            fontFamily: 'Inter',
-                            color: Color(0xFF4285F4),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                    ],
-                  ),
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30, right: 30),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-                        AbsensiTextfield(
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Harus Diisi';
-                            } else if (value.length < 8) {
-                              return 'Password Minimal 8 Karakter';
-                            }
-                            return null;
-                          },
-                          controller: passAktivasiController,
-                          hintText: 'Password',
-                          obscureText: true,
-                          obscuringCharacter: '*',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Center(
+                      child: Text(
+                        'Data Pegawai',
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
                         ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        AbsensiTextfield(
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Harus Diisi';
-                            } else if (value.length < 8) {
-                              return 'Password Minimal 8 Karakter';
-                            }
-                            return null;
-                          },
-                          controller: konfirPassController,
-                          hintText: 'Konfirmasi Password',
-                          obscureText: true,
-                          obscuringCharacter: '*',
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        AbsensiButton(
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    const Text(
+                      'Nama Lengkap :',
+                      style: TextStyle(
+                          fontFamily: 'Open Sans',
+                          fontSize: 15,
+                          color: Color(0xFFA8A8A8)),
+                    ),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      widget.dataKaryawan.data.namaLengkap,
+                      style: const TextStyle(
+                          fontFamily: 'Inter',
+                          color: Color(0xFF4285F4),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      'Alamat :',
+                      style: TextStyle(
+                          fontFamily: 'Open Sans',
+                          fontSize: 15,
+                          color: Color(0xFFA8A8A8)),
+                    ),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      widget.dataKaryawan.data.alamat,
+                      style: const TextStyle(
+                          fontFamily: 'Inter',
+                          color: Color(0xFF4285F4),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      'No Hp :',
+                      style: TextStyle(
+                          fontFamily: 'Open Sans',
+                          fontSize: 15,
+                          color: Color(0xFFA8A8A8)),
+                    ),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      widget.dataKaryawan.data.noHp,
+                      style: const TextStyle(
+                          fontFamily: 'Inter',
+                          color: Color(0xFF4285F4),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    const Text(
+                      'Jabatan :',
+                      style: TextStyle(
+                          fontFamily: 'Open Sans',
+                          fontSize: 15,
+                          color: Color(0xFFA8A8A8)),
+                    ),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    Text(
+                      widget.dataKaryawan.data.jabatan,
+                      style: const TextStyle(
+                          fontFamily: 'Inter',
+                          color: Color(0xFF4285F4),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30, right: 30),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      AbsensiTextfield(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Harus Diisi';
+                          } else if (value.length < 8) {
+                            return 'Password Minimal 8 Karakter';
+                          }
+                          return null;
+                        },
+                        controller: passAktivasiController,
+                        hintText: 'Password',
+                        obscureText: true,
+                        obscuringCharacter: '*',
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      AbsensiTextfield(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Harus Diisi';
+                          } else if (value.length < 8) {
+                            return 'Password Minimal 8 Karakter';
+                          }
+                          return null;
+                        },
+                        controller: konfirPassController,
+                        hintText: 'Konfirmasi Password',
+                        obscureText: true,
+                        obscuringCharacter: '*',
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: AbsensiButton(
                           onPressed: () {
                             onPressAktivasi(context);
                           },
@@ -297,18 +296,40 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
                           textColor: Colors.white,
                           color: const Color(0xFF4285F4),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );
     }
 
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.black,
+          ),
+        ),
+        title: const Text(
+          'Buat Password',
+          style: TextStyle(
+            fontFamily: 'Open Sans',
+            fontSize: 25,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+      ),
       body: content(),
     );
   }

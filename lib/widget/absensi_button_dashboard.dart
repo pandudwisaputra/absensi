@@ -1,5 +1,3 @@
-
-
 // ignore_for_file: use_build_context_synchronously, depend_on_referenced_packages
 
 import 'dart:convert';
@@ -41,7 +39,7 @@ class _ButtondashboardState extends State<Buttondashboard> {
         String? email = prefs.getString('email');
         var response = await http.get(
             Uri.parse(
-                'http://api.myfin.id:4000/api/statuskaryawancheck/$email'),
+                'http://api2.myfin.id:4500/api/statuskaryawancheck/$email'),
             headers: {
               'X-API-Key': "12345678",
               'Accept': "application/json",
@@ -117,9 +115,9 @@ class _ButtondashboardState extends State<Buttondashboard> {
                     AbsensiButton(
                       onPressed: () async {
                         SharedPreferences prefs =
-                                await SharedPreferences.getInstance();
-                            await prefs.setBool('isLoggedIn', false);
-                                                      exit(0);
+                            await SharedPreferences.getInstance();
+                        await prefs.setBool('isLoggedIn', false);
+                        exit(0);
                       },
                       color: const Color(0xFF4285F4),
                       textColor: Colors.white,

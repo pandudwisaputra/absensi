@@ -46,7 +46,7 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
         "tanggal_presensi": tanggalPresensi,
       });
       var response = await http.put(
-          Uri.parse('http://api.myfin.id:4000/api/presensikeluar'),
+          Uri.parse('http://api2.myfin.id:4500/api/presensikeluar'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -74,7 +74,7 @@ class _BottomSheetCheckOutState extends State<BottomSheetCheckOut> {
 
       int? idPegawai = server.getInt('idPegawai');
       var response = await http.get(
-          Uri.parse('http://api.myfin.id:4000/api/recognition/$idPegawai'),
+          Uri.parse('http://api2.myfin.id:4500/api/recognition/$idPegawai'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

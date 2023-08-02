@@ -29,9 +29,8 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
 
   Future<void> emailCheck({required String email}) async {
     try {
-
       var response = await http.get(
-          Uri.parse('http://api.myfin.id:4000/api/emailcheck/$email'),
+          Uri.parse('http://api2.myfin.id:4500/api/emailcheck/$email'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -54,14 +53,13 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
 
   Future<void> sendOtp({required String email}) async {
     try {
-
       final msg = jsonEncode(
         {
           "email": email,
         },
       );
       var response =
-          await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
+          await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
               headers: {
                 'X-API-Key': "12345678",
                 'Accept': "application/json",

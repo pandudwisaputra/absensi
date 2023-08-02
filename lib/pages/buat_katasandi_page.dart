@@ -39,7 +39,7 @@ class _BuatKataSandiState extends State<BuatKataSandi> {
         "new_password": newPassword,
       });
       var response = await http.put(
-          Uri.parse('http://api.myfin.id:4000/api/updatepassword'),
+          Uri.parse('http://api2.myfin.id:4500/api/updatepassword'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

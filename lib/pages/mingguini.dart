@@ -76,16 +76,16 @@ class MingguIni extends StatelessWidget {
                 String formatDate =
                     DateFormat("dd MMMM yyyy", "ID").format(parsedDateTime);
 
-                String jamMasuk = resultRiwayat[index].jamMasuk.contains('.') &&
-                        resultRiwayat[index].jamMasuk.split('.')[1].length == 1
-                    ? resultRiwayat[index].jamMasuk.replaceAll(".", ".0")
+                String jamMasuk = resultRiwayat[index].jamMasuk.contains(':') &&
+                        resultRiwayat[index].jamMasuk.split(':')[1].length == 1
+                    ? resultRiwayat[index].jamMasuk.replaceAll(":", ":0")
                     : resultRiwayat[index].jamMasuk;
 
                 String jamPulang = resultRiwayat[index]
                             .jamPulang
-                            .contains('.') &&
-                        resultRiwayat[index].jamPulang.split('.')[1].length == 1
-                    ? resultRiwayat[index].jamPulang.replaceAll(".", ".0")
+                            .contains(':') &&
+                        resultRiwayat[index].jamPulang.split(':')[1].length == 1
+                    ? resultRiwayat[index].jamPulang.replaceAll(".", ":0")
                     : resultRiwayat[index].jamPulang;
                 return SizedBox(
                   child: Column(

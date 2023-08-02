@@ -21,6 +21,8 @@ class RiwayatModel {
   String longitude;
   String alamat;
   String status;
+  String keteranganTidakMasuk;
+  String linkBukti;
 
   RiwayatModel({
     required this.idPresensi,
@@ -35,6 +37,8 @@ class RiwayatModel {
     required this.longitude,
     required this.alamat,
     required this.status,
+    required this.keteranganTidakMasuk,
+    required this.linkBukti,
   });
 
   factory RiwayatModel.fromJson(Map<String, dynamic> json) {
@@ -51,6 +55,8 @@ class RiwayatModel {
       longitude: json['longitude'],
       alamat: json['alamat'],
       status: json['status'],
+      keteranganTidakMasuk: json['keterangan_tidak_masuk'],
+      linkBukti: json['link_bukti'],
     );
   }
 }
@@ -61,7 +67,7 @@ class RiwayatRepository {
     int? id = prefs.getInt('idPegawai');
     try {
       var response = await http.get(
-          Uri.parse('http://api.myfin.id:4000/api/riwayatpresensi/$id'),
+          Uri.parse('http://api2.myfin.id:4500/api/riwayatpresensi/$id'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

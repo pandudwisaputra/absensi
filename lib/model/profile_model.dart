@@ -83,11 +83,12 @@ class ProfileRepository {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? id = prefs.getInt('idPegawai');
-      var response = await http
-          .get(Uri.parse('http://api.myfin.id:4000/api/profile/$id'), headers: {
-        'X-API-Key': "12345678",
-        'Accept': "application/json",
-      });
+      var response = await http.get(
+          Uri.parse('http://api2.myfin.id:4500/api/profile/$id'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          });
       if (response.statusCode == 200) {
         ProfileModel decode = ProfileModel.fromJson(jsonDecode(response.body));
         profil = decode;

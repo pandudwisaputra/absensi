@@ -114,17 +114,18 @@ class _DashboardPageState extends State<DashboardPage> {
                           GestureDetector(
                             onTap: () {
                               clickImage(
-                                  context,
-                                  profile.data.avatar == '-'
-                                      ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                      : profile.data.avatar);
+                                context,
+                                profile.data.avatar == '-'
+                                    ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
+                                    : 'http://api2.myfin.id/upload/${profile.data.avatar}',
+                              );
                             },
                             child: CircleAvatar(
                               radius: 24,
                               backgroundImage: NetworkImage(
                                 profile.data.avatar == '-'
                                     ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                    : profile.data.avatar,
+                                    : 'http://api2.myfin.id/upload/${profile.data.avatar}',
                               ),
                             ),
                           ),

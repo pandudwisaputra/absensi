@@ -5,6 +5,8 @@ import 'package:absensi/model/otp_model.dart';
 import 'package:absensi/pages/home/navbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_device_identifier/flutter_device_identifier.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -36,6 +38,27 @@ class _VerifikasiState extends State<Verifikasi> {
   int? responseRegister;
   bool _state = false;
   bool timerWidget = true;
+  String? _androidId;
+
+  @override
+  void initState() {
+    super.initState();
+    initPlatformState();
+  }
+
+  Future<void> initPlatformState() async {
+    String androidId;
+    try {
+      androidId = await FlutterDeviceIdentifier.androidID;
+    } on PlatformException {
+      androidId = 'Failed to get android ID.';
+    }
+    if (!mounted) return;
+
+    setState(() {
+      _androidId = androidId;
+    });
+  }
 
   Future<void> registerPegawai(
       {required String email, required String password}) async {
@@ -48,10 +71,11 @@ class _VerifikasiState extends State<Verifikasi> {
           "id_karyawan": idKaryawan,
           "email": email,
           "password": password,
+          "android_id": _androidId
         },
       );
       var response =
-          await http.post(Uri.parse('http://api.myfin.id:4000/api/register'),
+          await http.post(Uri.parse('http://api2.myfin.id:4500/api/register'),
               headers: {
                 "X-API-Key": "12345678",
                 'Accept': "application/json",
@@ -82,7 +106,6 @@ class _VerifikasiState extends State<Verifikasi> {
 
   Future<void> sendOtp() async {
     try {
-
       SharedPreferences email = await SharedPreferences.getInstance();
       String? emailRegister = email.getString('emailRegister');
       final msg = jsonEncode(
@@ -90,12 +113,12 @@ class _VerifikasiState extends State<Verifikasi> {
           "email": emailRegister,
         },
       );
-      await http.post(Uri.parse('http://api.myfin.id:4000/api/sendotp'),
-              headers: {
-                'X-API-Key': "12345678",
-                'Accept': "application/json",
-              },
-              body: msg);
+      await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          },
+          body: msg);
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
       await Navigator.pushAndRemoveUntil(
@@ -115,7 +138,6 @@ class _VerifikasiState extends State<Verifikasi> {
     required String email,
     required String otp,
   }) async {
-
     try {
       final msg = jsonEncode(
         {
@@ -124,7 +146,7 @@ class _VerifikasiState extends State<Verifikasi> {
         },
       );
       var response = await http.post(
-          Uri.parse('http://api.myfin.id:4000/api/otpvalidation'),
+          Uri.parse('http://api2.myfin.id:4500/api/otpvalidation'),
           headers: {
             "X-API-Key": "12345678",
             'Accept': "application/json",
