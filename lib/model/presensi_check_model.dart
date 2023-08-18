@@ -109,12 +109,11 @@ class PresensiCheckRepository {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? id = prefs.getInt('idPegawai');
-      var response = await http.get(
-          Uri.parse('http://api2.myfin.id:4500/api/presensicheck/$id'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          });
+      var response = await http
+          .get(Uri.parse('http://url/api/presensicheck/$id'), headers: {
+        'X-API-Key': "12345678",
+        'Accept': "application/json",
+      });
       if (response.statusCode == 200) {
         PresensiCheckModel decode =
             PresensiCheckModel.fromJson(jsonDecode(response.body));

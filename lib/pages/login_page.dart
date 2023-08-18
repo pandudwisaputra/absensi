@@ -68,20 +68,18 @@ class _LoginPageState extends State<LoginPage> {
         {required String email, required String password}) async {
       try {
         final msg = jsonEncode({"email": email, "password": password});
-        var response =
-            await http.post(Uri.parse('http://api2.myfin.id:4500/api/login'),
-                headers: {
-                  'X-API-Key': "12345678",
-                  'Accept': "application/json",
-                },
-                body: msg);
+        var response = await http.post(Uri.parse('http://url/api/login'),
+            headers: {
+              'X-API-Key': "12345678",
+              'Accept': "application/json",
+            },
+            body: msg);
         status = response.statusCode;
         if (response.statusCode == 200) {
           var decode = LoginModel.fromJson(jsonDecode(response.body));
           int idPegawai = decode.data.idUser;
           SharedPreferences prefsId = await SharedPreferences.getInstance();
           await prefsId.setInt('idPegawai', idPegawai);
-          await prefsId.setBool('isLoggedIn', true);
         }
       } catch (e) {
         var error = ExceptionHandlers().getExceptionString(e);
@@ -101,8 +99,7 @@ class _LoginPageState extends State<LoginPage> {
     Future<void> statusKaryawanCheck({required String email}) async {
       try {
         var response = await http.get(
-            Uri.parse(
-                'http://api2.myfin.id:4500/api/statuskaryawancheck/$email'),
+            Uri.parse('http://url/api/statuskaryawancheck/$email'),
             headers: {
               'X-API-Key': "12345678",
               'Accept': "application/json",
@@ -132,12 +129,11 @@ class _LoginPageState extends State<LoginPage> {
       try {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         int? idUser = prefs.getInt('idPegawai');
-        var response = await http.get(
-            Uri.parse('http://api2.myfin.id:4500/api/smartphonecheck/$idUser'),
-            headers: {
-              'X-API-Key': "12345678",
-              'Accept': "application/json",
-            });
+        var response = await http
+            .get(Uri.parse('http://url/api/smartphonecheck/$idUser'), headers: {
+          'X-API-Key': "12345678",
+          'Accept': "application/json",
+        });
         statusSmartphone = response.statusCode;
         if (response.statusCode == 200) {
           var decode = SmartphoneCheckModel.fromJson(jsonDecode(response.body));
@@ -207,6 +203,9 @@ class _LoginPageState extends State<LoginPage> {
                   setState(() {
                     _state = false;
                   });
+                  SharedPreferences prefsId =
+                      await SharedPreferences.getInstance();
+                  await prefsId.setBool('isLoggedIn', true);
                 } else {
                   setState(() {
                     _state = false;

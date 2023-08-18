@@ -90,13 +90,13 @@ class _BottomSheetCheckInTidakMasukState
         "keterangan_tidak_masuk": keterangan,
         "link_bukti": linkBukti,
       });
-      var response = await http.post(
-          Uri.parse('http://api2.myfin.id:4500/api/presensitidakmasuk'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          },
-          body: msg);
+      var response =
+          await http.post(Uri.parse('http://url/api/presensitidakmasuk'),
+              headers: {
+                'X-API-Key': "12345678",
+                'Accept': "application/json",
+              },
+              body: msg);
       responsePresensiMasuk = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);

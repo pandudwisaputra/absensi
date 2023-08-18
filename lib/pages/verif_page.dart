@@ -74,13 +74,12 @@ class _VerifikasiState extends State<Verifikasi> {
           "android_id": _androidId
         },
       );
-      var response =
-          await http.post(Uri.parse('http://api2.myfin.id:4500/api/register'),
-              headers: {
-                "X-API-Key": "12345678",
-                'Accept': "application/json",
-              },
-              body: msg);
+      var response = await http.post(Uri.parse('http://url/api/register'),
+          headers: {
+            "X-API-Key": "12345678",
+            'Accept': "application/json",
+          },
+          body: msg);
       var decode = AktivasiModel.fromJson(jsonDecode(response.body));
       setState(() => responseRegister = decode.code);
       if (response.statusCode == 200) {
@@ -113,7 +112,7 @@ class _VerifikasiState extends State<Verifikasi> {
           "email": emailRegister,
         },
       );
-      await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
+      await http.post(Uri.parse('http://url/api/sendotp'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -145,8 +144,7 @@ class _VerifikasiState extends State<Verifikasi> {
           "otp": otp,
         },
       );
-      var response = await http.post(
-          Uri.parse('http://api2.myfin.id:4500/api/otpvalidation'),
+      var response = await http.post(Uri.parse('http://url/api/otpvalidation'),
           headers: {
             "X-API-Key": "12345678",
             'Accept': "application/json",

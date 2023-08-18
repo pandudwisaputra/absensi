@@ -40,8 +40,7 @@ class _AktivasiPageState extends State<AktivasiPage> {
       {required String email, required String idKaryawan}) async {
     try {
       var response = await http.get(
-          Uri.parse(
-              'http://api2.myfin.id:4500/api/karyawancheck/$email/$idKaryawan'),
+          Uri.parse('http://url/api/karyawancheck/$email/$idKaryawan'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -75,8 +74,7 @@ class _AktivasiPageState extends State<AktivasiPage> {
       {required String email, required String idKaryawan}) async {
     try {
       var response = await http.get(
-          Uri.parse(
-              'http://api2.myfin.id:4500/api/usercheck/$email/$idKaryawan'),
+          Uri.parse('http://url/api/usercheck/$email/$idKaryawan'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

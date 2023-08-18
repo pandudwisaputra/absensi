@@ -98,8 +98,7 @@ class KaryawanRepository {
       String? email = prefs.getString('email');
       String? idKaryawan = prefs.getString('idKaryawan');
       var response = await http.get(
-          Uri.parse(
-              'http://api2.myfin.id:4500/api/karyawancheck/$email/$idKaryawan'),
+          Uri.parse('http://url/api/karyawancheck/$email/$idKaryawan'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

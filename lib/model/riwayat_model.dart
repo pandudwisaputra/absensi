@@ -66,12 +66,11 @@ class RiwayatRepository {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? id = prefs.getInt('idPegawai');
     try {
-      var response = await http.get(
-          Uri.parse('http://api2.myfin.id:4500/api/riwayatpresensi/$id'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          });
+      var response = await http
+          .get(Uri.parse('http://url/api/riwayatpresensi/$id'), headers: {
+        'X-API-Key': "12345678",
+        'Accept': "application/json",
+      });
       if (response.statusCode == 200) {
         Iterable it = jsonDecode(response.body)["data"];
         List<RiwayatModel> listRiwayat =

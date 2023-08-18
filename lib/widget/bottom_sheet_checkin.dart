@@ -51,8 +51,7 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
         "longitude": userLongitude,
         "alamat": userLocation
       });
-      var response = await http.post(
-          Uri.parse('http://api2.myfin.id:4500/api/presensimasuk'),
+      var response = await http.post(Uri.parse('http://url/api/presensimasuk'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -85,12 +84,11 @@ class _BottomSheetCheckInState extends State<BottomSheetCheckIn> {
       SharedPreferences server = await SharedPreferences.getInstance();
 
       int? idPegawai = server.getInt('idPegawai');
-      var response = await http.get(
-          Uri.parse('http://api2.myfin.id:4500/api/recognition/$idPegawai'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          });
+      var response = await http
+          .get(Uri.parse('http://url/api/recognition/$idPegawai'), headers: {
+        'X-API-Key': "12345678",
+        'Accept': "application/json",
+      });
       responseRecognitionCheck = response.statusCode;
       if (response.statusCode == 200) {
         dataRecognition =

@@ -41,7 +41,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
           "email": emailRegister,
         },
       );
-      await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
+      await http.post(Uri.parse('http://url/api/sendotp'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",
@@ -73,8 +73,7 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
           "otp": otp,
         },
       );
-      var response = await http.post(
-          Uri.parse('http://api2.myfin.id:4500/api/otpvalidation'),
+      var response = await http.post(Uri.parse('http://url/api/otpvalidation'),
           headers: {
             "X-API-Key": "12345678",
             'Accept': "application/json",
@@ -107,12 +106,11 @@ class _VerifLupaPwState extends State<VerifLupaPw> {
 
   Future<void> getIdUser() async {
     try {
-      var response = await http.get(
-          Uri.parse('http://api2.myfin.id:4500/api/getiduser/${widget.email}'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          });
+      var response = await http
+          .get(Uri.parse('http://url/api/getiduser/${widget.email}'), headers: {
+        'X-API-Key': "12345678",
+        'Accept': "application/json",
+      });
       responseGetIdUser = response.statusCode;
       if (response.statusCode == 200) {
         var decode = IdUserModel.fromJson(jsonDecode(response.body));

@@ -35,13 +35,12 @@ class _BuatKataSandiBaruState extends State<BuatKataSandiBaru> {
           "email": email,
         },
       );
-      var response =
-          await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
-              headers: {
-                'X-API-Key': "12345678",
-                'Accept': "application/json",
-              },
-              body: msg);
+      var response = await http.post(Uri.parse('http://url/api/sendotp'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          },
+          body: msg);
       responseSendOtp = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);

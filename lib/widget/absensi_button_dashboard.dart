@@ -38,8 +38,7 @@ class _ButtondashboardState extends State<Buttondashboard> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String? email = prefs.getString('email');
         var response = await http.get(
-            Uri.parse(
-                'http://api2.myfin.id:4500/api/statuskaryawancheck/$email'),
+            Uri.parse('http://url/api/statuskaryawancheck/$email'),
             headers: {
               'X-API-Key': "12345678",
               'Accept': "application/json",

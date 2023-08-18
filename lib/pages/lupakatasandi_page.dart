@@ -29,12 +29,11 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
 
   Future<void> emailCheck({required String email}) async {
     try {
-      var response = await http.get(
-          Uri.parse('http://api2.myfin.id:4500/api/emailcheck/$email'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          });
+      var response = await http
+          .get(Uri.parse('http://url/api/emailcheck/$email'), headers: {
+        'X-API-Key': "12345678",
+        'Accept': "application/json",
+      });
       responseEmailCheck = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -58,13 +57,12 @@ class _LupaKataSandiState extends State<LupaKataSandi> {
           "email": email,
         },
       );
-      var response =
-          await http.post(Uri.parse('http://api2.myfin.id:4500/api/sendotp'),
-              headers: {
-                'X-API-Key': "12345678",
-                'Accept': "application/json",
-              },
-              body: msg);
+      var response = await http.post(Uri.parse('http://url/api/sendotp'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          },
+          body: msg);
       responseSendOtp = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);

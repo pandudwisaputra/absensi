@@ -38,8 +38,7 @@ class _BuatKataSandiState extends State<BuatKataSandi> {
         "email": widget.email,
         "new_password": newPassword,
       });
-      var response = await http.put(
-          Uri.parse('http://api2.myfin.id:4500/api/updatepassword'),
+      var response = await http.put(Uri.parse('http://url/api/updatepassword'),
           headers: {
             'X-API-Key': "12345678",
             'Accept': "application/json",

@@ -109,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> uploadImage(BuildContext context, String filePath) async {
     try {
-      String url = 'http://api2.myfin.id/updateimagemobile/uploadimagemobile';
+      String url = 'http://url2/updateimagemobile/uploadimagemobile';
       var request = http.MultipartRequest('POST', Uri.parse(url));
       request.files.add(await http.MultipartFile.fromPath('file', filePath));
 
@@ -117,8 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (response.statusCode == 200) {
         var responseString = await response.stream.bytesToString();
-        var decodeId =
-            UploadImageModel.fromJson(jsonDecode(responseString));
+        var decodeId = UploadImageModel.fromJson(jsonDecode(responseString));
         ava = decodeId.fileName;
         updateAva(context: context, ava: ava);
         Navigator.pop(context);
@@ -137,13 +136,11 @@ class _ProfilePageState extends State<ProfilePage> {
             message: 'Terjadi Kesalahan',
           ),
         );
-
       }
     } catch (e) {
       print(e);
     }
   }
-
 
   Future<void> updateAva(
       {required BuildContext context, required String ava}) async {
@@ -151,13 +148,12 @@ class _ProfilePageState extends State<ProfilePage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       int? id = prefs.getInt('idPegawai');
       var msg = jsonEncode({"id_user": id, "ava": ava});
-      var response =
-          await http.post(Uri.parse('http://api2.myfin.id:4500/api/updateava'),
-              headers: {
-                'X-API-Key': "12345678",
-                'Accept': "application/json",
-              },
-              body: msg);
+      var response = await http.post(Uri.parse('http://url/api/updateava'),
+          headers: {
+            'X-API-Key': "12345678",
+            'Accept': "application/json",
+          },
+          body: msg);
       responseUpdateAva = response.statusCode;
     } catch (e) {
       var error = ExceptionHandlers().getExceptionString(e);
@@ -355,7 +351,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       context,
                                       profile.data.avatar == '-'
                                           ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                          : 'http://api2.myfin.id/upload/${profile.data.avatar}',
+                                          : 'http://url2/upload/${profile.data.avatar}',
                                     );
                                   },
                                   child: CircleAvatar(
@@ -363,7 +359,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     backgroundImage: NetworkImage(
                                       profile.data.avatar == '-'
                                           ? 'https://firebasestorage.googleapis.com/v0/b/presensi-17f1d.appspot.com/o/profile_picture%2Fimage_profile.png?alt=media&token=1a3f9725-8601-4c3c-a14d-cc1a222980d9'
-                                          : 'http://api2.myfin.id/upload/${profile.data.avatar}',
+                                          : 'http://url2/upload/${profile.data.avatar}',
                                     ),
                                   ),
                                 ),

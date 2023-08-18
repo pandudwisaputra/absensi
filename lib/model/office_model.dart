@@ -85,8 +85,8 @@ class OfficeRepository {
   static Future<OfficeModel?> getOffice(BuildContext context) async {
     OfficeModel? office;
     try {
-      var response = await http
-          .get(Uri.parse('http://api2.myfin.id:4500/api/office/1'), headers: {
+      var response =
+          await http.get(Uri.parse('http://url2:4500/api/office/1'), headers: {
         'X-API-Key': "12345678",
         'Accept': "application/json",
       });

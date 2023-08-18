@@ -102,12 +102,11 @@ class RecognitionRepository {
       SharedPreferences server = await SharedPreferences.getInstance();
 
       int? idPegawai = server.getInt('idPegawai');
-      var response = await http.get(
-          Uri.parse('http://api2.myfin.id:4500/api/recognition/$idPegawai'),
-          headers: {
-            'X-API-Key': "12345678",
-            'Accept': "application/json",
-          });
+      var response = await http
+          .get(Uri.parse('http://url/api/recognition/$idPegawai'), headers: {
+        'X-API-Key': "12345678",
+        'Accept': "application/json",
+      });
       if (response.statusCode == 200) {
         isAvailable = true;
       } else {
